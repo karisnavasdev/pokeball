@@ -6,11 +6,19 @@
   const NFT_CATALOG = [
     { id: "1", name: "POKEBALL Girl #001", image: "/girls/1.jpg", rarity: "common" },
     { id: "2", name: "POKEBALL Girl #002", image: "/girls/2.jpg", rarity: "common" },
-    { id: "3", name: "POKEBALL Girl #003", image: "/girls/3.jpg", rarity: "uncommon" },
-    { id: "4", name: "POKEBALL Girl #004", image: "/girls/4.jpg", rarity: "uncommon" },
-    { id: "5", name: "POKEBALL Girl #005", image: "/girls/5.jpg", rarity: "rare" },
-    { id: "6", name: "POKEBALL Girl #006", image: "/girls/6.jpg", rarity: "epic" },
-    { id: "7", name: "POKEBALL Girl #007", image: "/girls/7.jpg", rarity: "legendary" },
+    { id: "3", name: "POKEBALL Girl #003", image: "/girls/3.jpg", rarity: "common" },
+    { id: "4", name: "POKEBALL Girl #004", image: "/girls/4.jpg", rarity: "common" },
+    { id: "5", name: "POKEBALL Girl #005", image: "/girls/5.jpg", rarity: "uncommon" },
+    { id: "6", name: "POKEBALL Girl #006", image: "/girls/6.jpg", rarity: "uncommon" },
+    { id: "7", name: "POKEBALL Girl #007", image: "/girls/7.jpg", rarity: "uncommon" },
+    { id: "8", name: "POKEBALL Girl #008", image: "/girls/8.jpg", rarity: "uncommon" },
+    { id: "9", name: "POKEBALL Girl #009", image: "/girls/9.jpg", rarity: "rare" },
+    { id: "10", name: "POKEBALL Girl #010", image: "/girls/10.jpg", rarity: "rare" },
+    { id: "11", name: "POKEBALL Girl #011", image: "/girls/11.jpg", rarity: "rare" },
+    { id: "12", name: "POKEBALL Girl #012", image: "/girls/12.jpg", rarity: "epic" },
+    { id: "13", name: "POKEBALL Girl #013", image: "/girls/13.jpg", rarity: "epic" },
+    { id: "14", name: "POKEBALL Girl #014", image: "/girls/14.jpg", rarity: "legendary" },
+    { id: "15", name: "POKEBALL Girl #015", image: "/girls/15.jpg", rarity: "legendary" },
   ];
 
   function getOwned() {
