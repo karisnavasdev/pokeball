@@ -2,23 +2,24 @@
   "use strict";
 
   const STORAGE_KEY = "pokeball_nft_owned";
+  const MISSION_COUNT = 15;
 
   const NFT_CATALOG = [
-    { id: "1", name: "POKEBALL Girl #001", image: "/girls/1.jpg", rarity: "common" },
-    { id: "2", name: "POKEBALL Girl #002", image: "/girls/2.jpg", rarity: "common" },
-    { id: "3", name: "POKEBALL Girl #003", image: "/girls/3.jpg", rarity: "common" },
-    { id: "4", name: "POKEBALL Girl #004", image: "/girls/4.jpg", rarity: "common" },
-    { id: "5", name: "POKEBALL Girl #005", image: "/girls/5.jpg", rarity: "uncommon" },
-    { id: "6", name: "POKEBALL Girl #006", image: "/girls/6.jpg", rarity: "uncommon" },
-    { id: "7", name: "POKEBALL Girl #007", image: "/girls/7.jpg", rarity: "uncommon" },
-    { id: "8", name: "POKEBALL Girl #008", image: "/girls/8.jpg", rarity: "uncommon" },
-    { id: "9", name: "POKEBALL Girl #009", image: "/girls/9.jpg", rarity: "rare" },
-    { id: "10", name: "POKEBALL Girl #010", image: "/girls/10.jpg", rarity: "rare" },
-    { id: "11", name: "POKEBALL Girl #011", image: "/girls/11.jpg", rarity: "rare" },
-    { id: "12", name: "POKEBALL Girl #012", image: "/girls/12.jpg", rarity: "epic" },
-    { id: "13", name: "POKEBALL Girl #013", image: "/girls/13.jpg", rarity: "epic" },
-    { id: "14", name: "POKEBALL Girl #014", image: "/girls/14.jpg", rarity: "legendary" },
-    { id: "15", name: "POKEBALL Girl #015", image: "/girls/15.jpg", rarity: "legendary" },
+    { id: "1", mission: 1, name: "POKEBALL Girl #001", image: "/girls/1.jpg", rarity: "common" },
+    { id: "2", mission: 2, name: "POKEBALL Girl #002", image: "/girls/2.jpg", rarity: "common" },
+    { id: "3", mission: 3, name: "POKEBALL Girl #003", image: "/girls/3.jpg", rarity: "common" },
+    { id: "4", mission: 4, name: "POKEBALL Girl #004", image: "/girls/4.jpg", rarity: "common" },
+    { id: "5", mission: 5, name: "POKEBALL Girl #005", image: "/girls/5.jpg", rarity: "uncommon" },
+    { id: "6", mission: 6, name: "POKEBALL Girl #006", image: "/girls/6.jpg", rarity: "uncommon" },
+    { id: "7", mission: 7, name: "POKEBALL Girl #007", image: "/girls/7.jpg", rarity: "uncommon" },
+    { id: "8", mission: 8, name: "POKEBALL Girl #008", image: "/girls/8.jpg", rarity: "uncommon" },
+    { id: "9", mission: 9, name: "POKEBALL Girl #009", image: "/girls/9.jpg", rarity: "rare" },
+    { id: "10", mission: 10, name: "POKEBALL Girl #010", image: "/girls/10.jpg", rarity: "rare" },
+    { id: "11", mission: 11, name: "POKEBALL Girl #011", image: "/girls/11.jpg", rarity: "rare" },
+    { id: "12", mission: 12, name: "POKEBALL Girl #012", image: "/girls/12.jpg", rarity: "epic" },
+    { id: "13", mission: 13, name: "POKEBALL Girl #013", image: "/girls/13.jpg", rarity: "epic" },
+    { id: "14", mission: 14, name: "POKEBALL Girl #014", image: "/girls/14.jpg", rarity: "legendary" },
+    { id: "15", mission: 15, name: "POKEBALL Girl #015", image: "/girls/15.jpg", rarity: "legendary" },
   ];
 
   function getOwned() {
@@ -36,41 +37,44 @@
   }
 
   function getCard(id) {
-    return NFT_CATALOG.find((c) => c.id === id) || NFT_CATALOG[0];
+    return NFT_CATALOG.find((c) => c.id === String(id)) || NFT_CATALOG[0];
   }
 
-  function pickRewardCard() {
-    const owned = getOwned();
-    const unowned = NFT_CATALOG.filter((c) => !owned.has(c.id));
-    const pool = unowned.length ? unowned : NFT_CATALOG;
-    return pool[Math.floor(Math.random() * pool.length)];
+  function getCardByMission(mission) {
+    return NFT_CATALOG.find((c) => c.mission === mission) || getCard(mission);
   }
 
-  function grantReward() {
-    const card = pickRewardCard();
+  function unlockMission(mission) {
+    const card = getCardByMission(mission);
     const owned = getOwned();
     const isNew = !owned.has(card.id);
     owned.add(card.id);
     saveOwned(owned);
-    return { card, isNew };
+    return { card, isNew, mission };
+  }
+
+  function isMissionUnlocked(mission) {
+    return getOwned().has(String(mission));
   }
 
   function createCardElement(card, opts = {}) {
     const owned = opts.owned ?? getOwned().has(card.id);
     const locked = opts.locked ?? !owned;
     const reward = opts.reward ?? false;
+    const roundLabel = `ROUND ${String(card.mission).padStart(2, "0")}`;
 
     const el = document.createElement("article");
     el.className = "nft-card" +
       (locked ? " nft-card--locked" : "") +
       (reward ? " nft-card--reward" : "");
     el.dataset.id = card.id;
+    el.dataset.mission = String(card.mission);
 
     el.innerHTML = `
       <div class="nft-card-shine"></div>
       <div class="nft-card-frame">
         <header class="nft-card-header">
-          <span class="nft-chain">Solana</span>
+          <span class="nft-mission">${roundLabel}</span>
           <span class="nft-rarity nft-rarity--${card.rarity}">${card.rarity}</span>
         </header>
         <div class="nft-card-art">
@@ -78,10 +82,10 @@
         </div>
         <footer class="nft-card-footer">
           <h3>${card.name}</h3>
-          <span class="nft-id">#${card.id.padStart(4, "0")}</span>
+          <span class="nft-id">NFT #${card.id.padStart(2, "0")}</span>
         </footer>
       </div>
-      ${locked ? '<div class="nft-lock" aria-hidden="true">🔒</div>' : ""}
+      ${locked ? `<div class="nft-lock" aria-hidden="true"><span class="nft-lock-round">${roundLabel}</span><span class="nft-lock-icon">🔒</span></div>` : ""}
     `;
     return el;
   }
@@ -113,7 +117,7 @@
   function updateCollectCount(el) {
     if (!el) return;
     const owned = getOwned();
-    el.textContent = `${owned.size} / ${NFT_CATALOG.length} Collected`;
+    el.textContent = `${owned.size} / ${MISSION_COUNT} Missions`;
   }
 
   function showRewardModal(modal, card, title, subtitle, onClose) {
@@ -147,9 +151,12 @@
 
   window.PokeNft = {
     NFT_CATALOG,
+    MISSION_COUNT,
     getOwned,
-    grantReward,
+    unlockMission,
+    isMissionUnlocked,
     getCard,
+    getCardByMission,
     createCardElement,
     renderGallery,
     updateCollectCount,

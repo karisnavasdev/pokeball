@@ -89,6 +89,7 @@
 
   const FPS = 60;
   const SEC = (n) => n * FPS;
+  const MAX_ROUNDS = 15;
 
   const ballImg = new Image();
   let ballImgReady = false;
@@ -373,7 +374,38 @@
     buildLevel(state.level);
     resetBall();
     updateHud();
-    flashMessage(`LEVEL ${state.level}`);
+    flashMessage(`ROUND ${state.level}`);
+  }
+
+  function onMissionCleared(completedRound) {
+    state.running = false;
+    const finish = () => {
+      refreshNftUi();
+      if (completedRound >= MAX_ROUNDS) {
+        winGame();
+      } else {
+        state.running = true;
+        levelComplete();
+      }
+    };
+
+    if (!window.PokeNft) {
+      finish();
+      return;
+    }
+
+    const { card, isNew } = PokeNft.unlockMission(completedRound);
+    if (isNew) {
+      PokeNft.showRewardModal(
+        nftRewardModal,
+        card,
+        `Mission ${completedRound} Complete!`,
+        `NFT #${String(completedRound).padStart(2, "0")} unlocked!`,
+        finish
+      );
+    } else {
+      finish();
+    }
   }
 
   function loseLife() {
@@ -393,21 +425,17 @@
   function gameOver() {
     clearBuffs();
     state.running = false;
-    showNftReward("end", () => {
-      overlay.classList.remove("hidden");
-      if (overlayTitle) overlayTitle.textContent = "GAME OVER";
-      if (overlayMsg) overlayMsg.textContent = `Score: ${state.score} · +${state.sessionCoins} coins`;
-    });
+    overlay.classList.remove("hidden");
+    if (overlayTitle) overlayTitle.textContent = "GAME OVER";
+    if (overlayMsg) overlayMsg.textContent = `Score: ${state.score} · Round ${state.level} · +${state.sessionCoins} coins`;
   }
 
   function winGame() {
     clearBuffs();
     state.running = false;
-    showNftReward("end", () => {
-      overlay.classList.remove("hidden");
-      if (overlayTitle) overlayTitle.textContent = "YOU WIN!";
-      if (overlayMsg) overlayMsg.textContent = `Champion! Score: ${state.score} · +${state.sessionCoins} coins`;
-    });
+    overlay.classList.remove("hidden");
+    if (overlayTitle) overlayTitle.textContent = "ALL 15 MISSIONS CLEAR!";
+    if (overlayMsg) overlayMsg.textContent = `Champion! Score: ${state.score} · All NFTs unlocked!`;
   }
 
   let flashText = "";
@@ -426,20 +454,10 @@
     PokeNft.updateCollectCount(document.getElementById("nft-count-modal"));
   }
 
-  function showNftReward(phase, onDone) {
-    if (!window.PokeNft) {
-      onDone();
-      return;
-    }
-    const { card, isNew } = PokeNft.grantReward();
-    const title = phase === "start" ? "Start Game Reward!" : "End Game Reward!";
-    const sub = isNew
-      ? `New NFT unlocked — ${card.name}!`
-      : `${card.name} added to your collection!`;
-    PokeNft.showRewardModal(nftRewardModal, card, title, sub, () => {
-      refreshNftUi();
-      onDone();
-    });
+  function startGame() {
+    if (state.shopOpen) closeShop();
+    if (state.nftOpen) closeNft();
+    beginGameplay();
   }
 
   function showGameUi() {
@@ -469,12 +487,6 @@
     setTimeout(() => {
       if (state.running && state.ballAttached) launchBall();
     }, 900);
-  }
-
-  function startGame() {
-    if (state.shopOpen) closeShop();
-    if (state.nftOpen) closeNft();
-    showNftReward("start", beginGameplay);
   }
 
   function circleRect(cx, cy, cr, rx, ry, rw, rh) {
@@ -802,8 +814,7 @@
     state.hitTexts = state.hitTexts.filter((t) => t.life > 0);
 
     if (state.bricks.length && state.bricks.every((b) => b.dead)) {
-      if (state.level >= 10) winGame();
-      else levelComplete();
+      onMissionCleared(state.level);
     }
 
     if (state.shake > 0) state.shake *= 0.82;

@@ -25,7 +25,7 @@
     <section id="game-lobby" class="game-lobby panel-box">
       <img src="ball.png" alt="POKEBALL" class="lobby-ball" width="112" height="112">
       <h1>POKEBALL BREAKER</h1>
-      <p>Smash blocks, collect NFT cards, and unlock power balls!</p>
+      <p>Clear Rounds 1–15 to unlock NFT cards #001–#015!</p>
       <p class="controls-hint">← → move paddle · Space or tap to launch</p>
       <div class="lobby-actions">
         <button id="start-btn" type="button" class="chip-btn chip-btn--play">▶ Start Game</button>
@@ -36,7 +36,7 @@
     <div id="game-ui" class="game-ui hidden" aria-hidden="true">
       <div class="hud-grid panel-box">
         <div class="hud-item"><label>Score</label><strong id="score">0</strong></div>
-        <div class="hud-item"><label>Level</label><strong id="level">1</strong></div>
+        <div class="hud-item"><label>Round</label><strong id="level">1</strong></div>
         <div class="hud-item"><label>Lives</label><strong id="lives">3</strong></div>
         <div class="hud-item"><label>Coins</label><strong id="coins">0</strong></div>
       </div>
@@ -45,7 +45,7 @@
         <aside class="stage-side stage-side--left panel-box">
           <div class="side-head">
             <h2>🎴 NFT Cards</h2>
-            <span class="nft-collect-count" id="nft-count-game">0 / 15</span>
+            <span class="nft-collect-count" id="nft-count-game">0 / 15 Missions</span>
           </div>
           <div id="nft-gallery-left" class="side-gallery"></div>
         </aside>
@@ -84,8 +84,8 @@
     <div id="nft-collection-panel" class="shop-panel hidden" aria-hidden="true">
       <div class="shop-header">
         <h2>My NFT Collection</h2>
-        <p>Win cards when you start &amp; finish each game.</p>
-        <div class="shop-wallet"><span class="nft-collect-count" id="nft-count-modal">0 / 15</span></div>
+        <p>Clear each round to unlock the matching NFT card.</p>
+        <div class="shop-wallet"><span class="nft-collect-count" id="nft-count-modal">0 / 15 Missions</span></div>
         <button type="button" id="nft-close" class="shop-close" aria-label="Close collection">✕</button>
       </div>
       <div id="nft-gallery-collection"></div>
@@ -107,6 +107,6 @@
     </footer>
   </div>
   <script src="/nft-cards.js"></script>
-  <script src="game.js?v=12"></script>
+  <script src="game.js?v=13"></script>
 </body>
 </html>
