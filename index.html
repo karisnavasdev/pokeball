@@ -3,11 +3,81 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0; url=/ace-breaker-rg/gb/en/">
-  <title>Ace Breaker</title>
-  <script>location.replace("/ace-breaker-rg/gb/en/");</script>
+  <title>$POKEBALL — Play & Pump</title>
+  <meta name="description" content="POKEBALL — Solana arcade breaker. Catch the pump. Break bricks.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <p><a href="/ace-breaker-rg/gb/en/">Play Ace Breaker</a></p>
+  <div class="bg-image" aria-hidden="true"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-scanlines" aria-hidden="true"></div>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
+      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
+      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
+    </div>
+  </div>
+
+  <header class="nav">
+    <div class="logo">$POKEBALL</div>
+    <nav class="nav-links">
+      <a href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">Chart</a>
+      <a href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer">Buy</a>
+      <a href="/ace-breaker-rg/gb/en/" class="nav-play">Play</a>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <div class="hero-badge">SOLANA ARCADE</div>
+    <h1>
+      <span class="gradient">$POKEBALL</span>
+      <span class="sub">Break bricks. Catch the pump.</span>
+    </h1>
+    <p class="lead">The on-chain arcade experience. Smash blocks, stack score, and ride the POKEPUMP wave.</p>
+
+    <div class="ca-box">
+      <span class="ca-label">CONTRACT</span>
+      <code id="ca" class="ca-value">pokepump</code>
+      <button type="button" class="copy-btn" id="copy-ca" aria-label="Copy contract">Copy</button>
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-buy" href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer">Buy Now</a>
+      <a class="btn btn-dex" href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">DexScreener</a>
+      <a class="btn btn-play" href="/ace-breaker-rg/gb/en/">Play Game</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span class="stat-k">Ticker</span><span class="stat-v">$POKEBALL</span></div>
+      <div class="stat"><span class="stat-k">Chain</span><span class="stat-v">Solana</span></div>
+      <div class="stat"><span class="stat-k">CA</span><span class="stat-v">pokepump</span></div>
+    </div>
+  </main>
+
+  <section class="game-panel">
+    <div class="panel-head">
+      <h2>Arcade Mode</h2>
+      <p>Launch the breaker. No wallet required to play.</p>
+    </div>
+    <a class="game-card" href="/ace-breaker-rg/gb/en/">
+      <div class="game-thumb"></div>
+      <div class="game-meta">
+        <strong>POKEBALL Breaker</strong>
+        <span>Click to play →</span>
+      </div>
+    </a>
+  </section>
+
+  <footer class="footer">
+    <p>$POKEBALL · CA: pokepump · Not financial advice. Play responsibly.</p>
+  </footer>
+
+  <script src="/site.js"></script>
 </body>
 </html>
