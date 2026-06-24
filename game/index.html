@@ -42,9 +42,17 @@
       </div>
 
       <div class="game-stage">
+        <aside class="stage-side stage-side--left panel-box">
+          <div class="side-head">
+            <h2>🎴 NFT Cards</h2>
+            <span class="nft-collect-count" id="nft-count-game">0 / 15</span>
+          </div>
+          <div id="nft-gallery-left" class="side-gallery"></div>
+        </aside>
+
         <div class="stage-main">
           <div class="canvas-wrap panel-box">
-            <canvas id="game" width="480" height="640" aria-label="POKEBALL Breaker game"></canvas>
+            <canvas id="game" width="600" height="780" aria-label="POKEBALL Breaker game"></canvas>
             <div id="overlay" class="overlay hidden">
               <img src="ball.png" alt="POKEBALL" class="overlay-ball" width="96" height="96">
               <h2 id="overlay-title">GAME OVER</h2>
@@ -54,12 +62,11 @@
           </div>
         </div>
 
-        <aside class="stage-side panel-box">
+        <aside class="stage-side stage-side--right panel-box">
           <div class="side-head">
-            <h2>🎴 NFT Collection</h2>
-            <span class="nft-collect-count" id="nft-count-game">0 / 15</span>
+            <h2>🎴 Collection</h2>
           </div>
-          <div id="nft-gallery-game" class="side-gallery"></div>
+          <div id="nft-gallery-right" class="side-gallery"></div>
         </aside>
       </div>
     </div>
@@ -100,6 +107,6 @@
     </footer>
   </div>
   <script src="/nft-cards.js"></script>
-  <script src="game.js?v=9"></script>
+  <script src="game.js?v=10"></script>
 </body>
 </html>

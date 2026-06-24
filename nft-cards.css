@@ -13,6 +13,19 @@
   gap: 0.5rem;
 }
 
+.nft-gallery--side {
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.nft-gallery--side .nft-card-footer h3 {
+  font-size: 0.48rem;
+}
+
+.nft-gallery--side .nft-card-art {
+  aspect-ratio: 1;
+}
+
 .nft-card {
   position: relative;
   border-radius: 14px;

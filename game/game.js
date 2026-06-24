@@ -59,14 +59,15 @@
 
   const W = canvas.width;
   const H = canvas.height;
-  const PADDLE_Y = H - 36;
-  const PADDLE_H = 14;
+  const BALL_R = 10;
+  const PADDLE_Y = H - 42;
+  const PADDLE_H = 12;
 
-  const BRICK_COLS = 8;
-  const BRICK_ROWS = 7;
-  const BRICK_PAD = 4;
-  const BRICK_TOP = 64;
-  const BRICK_H = 24;
+  const BRICK_COLS = 10;
+  const BRICK_ROWS = 11;
+  const BRICK_PAD = 3;
+  const BRICK_TOP = 48;
+  const BRICK_H = 20;
 
   const COLORS = [
     { fill: "#ff4757", glow: "#ff6b81", pts: 50, name: "FIRE" },
@@ -175,7 +176,7 @@
     const def = getBallDef(wallet.equipped);
     return {
       x, y,
-      r: 16,
+      r: BALL_R,
       vx: 0,
       vy: 0,
       speed: 5 + state.level * 0.12,
@@ -188,7 +189,18 @@
   }
 
   function paddleBallY() {
-    return PADDLE_Y - 16 - 4;
+    return PADDLE_Y - BALL_R - 4;
+  }
+
+  function clearBuffs() {
+    state.buffs = { multiball5: 0, guard: 0, megabar: 0, fireHits: 0 };
+    state.balls.forEach((b) => { b.giftFire = false; });
+    const flying = state.balls.filter((b) => !b.dead && !b.attached);
+    while (flying.length > 1) {
+      const extra = flying.pop();
+      extra.dead = true;
+    }
+    resetPaddle();
   }
 
   function resetBall() {
@@ -200,7 +212,7 @@
   function buildLevel(lvl) {
     const bricks = [];
     const bw = brickWidth();
-    const rows = Math.min(BRICK_ROWS + Math.floor((lvl - 1) / 2), 9);
+    const rows = Math.min(BRICK_ROWS + Math.floor((lvl - 1) / 2), 13);
     const giftKeys = Object.keys(GIFT_DEFS);
     let giftIdx = 0;
     for (let r = 0; r < rows; r++) {
@@ -355,9 +367,9 @@
   }
 
   function levelComplete() {
+    clearBuffs();
     state.level++;
     state.paddle.wide = Math.max(0, state.paddle.wide - 60);
-    resetPaddle();
     buildLevel(state.level);
     resetBall();
     updateHud();
@@ -365,6 +377,7 @@
   }
 
   function loseLife() {
+    clearBuffs();
     state.lives--;
     updateHud();
     state.balls = [];
@@ -373,12 +386,12 @@
       gameOver();
       return;
     }
-    resetPaddle();
     resetBall();
     flashMessage("LIFE LOST");
   }
 
   function gameOver() {
+    clearBuffs();
     state.running = false;
     showNftReward("end", () => {
       overlay.classList.remove("hidden");
@@ -388,6 +401,7 @@
   }
 
   function winGame() {
+    clearBuffs();
     state.running = false;
     showNftReward("end", () => {
       overlay.classList.remove("hidden");
@@ -405,7 +419,8 @@
 
   function refreshNftUi() {
     if (!window.PokeNft) return;
-    PokeNft.renderGallery(document.getElementById("nft-gallery-game"), { compact: true });
+    PokeNft.renderGallery(document.getElementById("nft-gallery-left"), { compact: true, side: "left" });
+    PokeNft.renderGallery(document.getElementById("nft-gallery-right"), { compact: true, side: "right" });
     PokeNft.renderGallery(document.getElementById("nft-gallery-collection"));
     PokeNft.updateCollectCount(document.getElementById("nft-count-game"));
     PokeNft.updateCollectCount(document.getElementById("nft-count-modal"));
