@@ -557,6 +557,13 @@ html, body {
   backdrop-filter: blur(8px);
 }
 
+.btn-x {
+  background: rgba(12, 12, 22, 0.75);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+}
+
 .btn-play {
   background: linear-gradient(135deg, var(--purple), #6b2fd6);
   color: #fff;
@@ -683,6 +690,15 @@ html, body {
   text-shadow: 0 0 8px rgba(153, 69, 255, 0.15);
 }
 
+.footer a {
+  color: var(--green);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 960px) {
   .hero-hub { grid-template-columns: 1fr; }
   .feature-array { grid-template-columns: repeat(2, 1fr); }
@@ -691,7 +707,7 @@ html, body {
 }
 
 @media (max-width: 640px) {
-  .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links a:not(.nav-cta):not(.nav-social) { display: none; }
   .feature-array { grid-template-columns: 1fr; }
   .stat-array { grid-template-columns: 1fr 1fr; }
   .hero-main { padding: 1.5rem 1.25rem; }
