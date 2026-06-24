@@ -29,7 +29,7 @@
     <nav class="nav-links">
       <a href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">Chart</a>
       <a href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer">Buy</a>
-      <a href="/game/" class="nav-play">Play</a>
+      <a href="#play" class="nav-play">Play</a>
     </nav>
   </header>
 
@@ -50,7 +50,7 @@
     <div class="actions">
       <a class="btn btn-buy" href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer">Buy Now</a>
       <a class="btn btn-dex" href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">DexScreener</a>
-      <a class="btn btn-play" href="/game/">Play Game</a>
+      <a class="btn btn-play" href="#play">Play Game</a>
     </div>
 
     <div class="stats">
@@ -60,18 +60,15 @@
     </div>
   </main>
 
-  <section class="game-panel">
+  <section class="game-panel" id="play">
     <div class="panel-head">
-      <h2>POKEBALL Arcade</h2>
-      <p>Smash blocks with your logo ball. Power-ups, levels, and high scores.</p>
+      <h2>Play POKEBALL Breaker</h2>
+      <p>Click Start, then move the paddle. The ball launches automatically.</p>
     </div>
-    <a class="game-card" href="/game/">
-      <div class="game-thumb"></div>
-      <div class="game-meta">
-        <strong>POKEBALL Breaker</strong>
-        <span>Brick breaker · Play now →</span>
-      </div>
-    </a>
+    <div class="game-embed-wrap">
+      <iframe src="/game/" title="POKEBALL Breaker Game" class="game-embed" allow="autoplay"></iframe>
+    </div>
+    <a class="btn btn-play game-fullscreen" href="/game/">Open Full Screen Game</a>
   </section>
 
   <footer class="footer">

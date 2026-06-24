@@ -1,6 +1,19 @@
 (() => {
   "use strict";
 
+  // Safari / older browser support
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+      const r = typeof radii === "number" ? radii : 4;
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+    };
+  }
+
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
   const overlay = document.getElementById("overlay");
@@ -35,7 +48,7 @@
   let ballImgReady = false;
   ballImg.onload = () => { ballImgReady = true; };
   ballImg.onerror = () => { ballImgReady = false; };
-  ballImg.src = "/game/ball.png";
+  ballImg.src = "ball.png";
 
   const keys = {};
   let pointerX = W / 2;
@@ -217,6 +230,9 @@
     overlay.querySelector("h1").textContent = "POKEBALL BREAKER";
     overlay.querySelector("p").textContent = "Break all blocks with your POKEBALL!";
     startBtn.textContent = "Start Game";
+    setTimeout(() => {
+      if (state.running && state.ballAttached) launchBall();
+    }, 900);
   }
 
   function circleRect(cx, cy, cr, rx, ry, rw, rh) {
@@ -428,6 +444,7 @@
   }
 
   function draw() {
+    try {
     const shakeX = (Math.random() - 0.5) * state.shake;
     const shakeY = (Math.random() - 0.5) * state.shake;
     ctx.save();
@@ -521,6 +538,9 @@
     }
 
     ctx.restore();
+    } catch (err) {
+      console.error("POKEBALL draw error:", err);
+    }
   }
 
   function loop() {
