@@ -81,10 +81,10 @@
   const POWER_TYPES = ["wide", "multiball", "slow", "life"];
 
   const GIFT_DEFS = {
-    multiball5: { fill: "#ff2d2d", glow: "#ff6b6b", name: "×5", pts: 100, label: "5 BALLS 5s" },
-    fire10: { fill: "#00e676", glow: "#69f0ae", name: "FIRE", pts: 120, label: "FIRE ×5" },
-    guard: { fill: "#448aff", glow: "#82b1ff", name: "GUARD", pts: 110, label: "GUARD 4s" },
-    megabar: { fill: "#ff4081", glow: "#ff80ab", name: "BIG", pts: 100, label: "BAR ×3 5s" },
+    multiball: { fill: "#ff2d2d", glow: "#ff6b6b", name: "GIFT", pts: 0 },
+    fire: { fill: "#00e676", glow: "#69f0ae", name: "GIFT", pts: 0 },
+    guard: { fill: "#448aff", glow: "#82b1ff", name: "GIFT", pts: 0 },
+    megabar: { fill: "#ff4081", glow: "#ff80ab", name: "GIFT", pts: 0 },
   };
 
   const FPS = 60;
@@ -152,7 +152,9 @@
     ballAttached: true,
     shake: 0,
     hitTexts: [],
-    buffs: { multiball5: 0, guard: 0, megabar: 0, fireHits: 0 },
+    buffs: { multiball5: 0, multiballTarget: 3, guard: 0, megabar: 0, fireHits: 0 },
+    giftsPerRound: 3,
+    giftsLeft: 3,
   };
 
   const PADDLE_BASE_W = 104;
@@ -193,7 +195,7 @@
   }
 
   function clearBuffs() {
-    state.buffs = { multiball5: 0, guard: 0, megabar: 0, fireHits: 0 };
+    state.buffs = { multiball5: 0, multiballTarget: 3, guard: 0, megabar: 0, fireHits: 0 };
     state.balls.forEach((b) => { b.giftFire = false; });
     const flying = state.balls.filter((b) => !b.dead && !b.attached);
     while (flying.length > 1) {
@@ -209,53 +211,33 @@
     state.ballAttached = true;
   }
 
+  function giftPower() {
+    return 3 + Math.floor(Math.random() * 2);
+  }
+
+  function resetLevelGifts(lvl) {
+    state.giftsPerRound = 3 + (lvl % 2);
+    state.giftsLeft = state.giftsPerRound;
+  }
+
+  function tryGiftOnBrickBreak(brickX, brickY) {
+    if (state.giftsLeft <= 0) return;
+    const bricksLeft = state.bricks.filter((b) => !b.dead).length;
+    const chance = state.giftsLeft / Math.max(1, bricksLeft + state.giftsLeft);
+    if (Math.random() > Math.min(0.55, chance * 1.8)) return;
+    state.giftsLeft--;
+    const keys = Object.keys(GIFT_DEFS);
+    activateGift(keys[Math.floor(Math.random() * keys.length)], brickX, brickY);
+  }
+
   function buildLevel(lvl) {
     const bricks = [];
     const bw = brickWidth();
     const rows = Math.min(BRICK_ROWS + Math.floor((lvl - 1) / 2), 13);
-    const giftKeys = Object.keys(GIFT_DEFS);
-    const openSlots = [];
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < BRICK_COLS; c++) {
         if (lvl > 2 && (r + c + lvl) % 11 === 0) continue;
-        openSlots.push({ r, c });
-      }
-    }
-
-    const giftCount = Math.min(3 + (lvl % 2), openSlots.length);
-    const giftAt = new Set();
-    const pool = openSlots.filter((s) => s.r >= 1);
-    while (giftAt.size < giftCount && pool.length > 0) {
-      const i = Math.floor(Math.random() * pool.length);
-      const { r, c } = pool.splice(i, 1)[0];
-      giftAt.add(`${r},${c}`);
-    }
-
-    let giftIdx = 0;
-    for (const { r, c } of openSlots) {
-      const key = `${r},${c}`;
-      if (giftAt.has(key)) {
-        const giftKey = giftKeys[giftIdx % giftKeys.length];
-        giftIdx++;
-        const g = GIFT_DEFS[giftKey];
-        bricks.push({
-          x: BRICK_PAD + c * (bw + BRICK_PAD),
-          y: BRICK_TOP + r * (BRICK_H + BRICK_PAD),
-          w: bw,
-          h: BRICK_H,
-          row: r,
-          col: c,
-          hp: 1,
-          maxHp: 1,
-          isGift: true,
-          gift: giftKey,
-          fill: g.fill,
-          glow: g.glow,
-          name: g.name,
-          pts: g.pts,
-        });
-      } else {
         const type = COLORS[(r + c + lvl) % COLORS.length];
         const hp = r < 2 && lvl >= 4 ? 2 : 1;
         bricks.push({
@@ -272,50 +254,55 @@
       }
     }
     state.bricks = bricks;
+    resetLevelGifts(lvl);
   }
 
   function popHitText(x, y, text, color = "#14f195") {
     state.hitTexts.push({ x, y, text, color, life: 1 });
   }
 
-  function activateGift(giftKey) {
+  function activateGift(giftKey, x, y) {
     const g = GIFT_DEFS[giftKey];
     if (!g) return;
+    const px = x ?? W / 2;
+    const py = y ?? H / 2;
+    const amt = giftPower();
     switch (giftKey) {
-      case "multiball5":
-        state.buffs.multiball5 = SEC(5);
-        ensureFiveBalls();
-        flashMessage("GIFT: 5 BALLS 5s!");
-        popHitText(W / 2, H / 2, "×5 5s", "#ff2d2d");
+      case "multiball":
+        state.buffs.multiballTarget = amt;
+        state.buffs.multiball5 = SEC(4);
+        ensureMultiball(amt);
+        flashMessage(`GIFT: ${amt} BALLS!`);
+        popHitText(px, py, `×${amt} BALLS`, "#ff2d2d");
         break;
-      case "fire10":
-        state.buffs.fireHits = 5;
+      case "fire":
+        state.buffs.fireHits = amt;
         state.balls.forEach((b) => { if (!b.dead) b.giftFire = true; });
-        flashMessage("GIFT: FIRE ×5!");
-        popHitText(W / 2, H / 2, "FIRE ×5", "#00e676");
+        flashMessage(`GIFT: FIRE ×${amt}!`);
+        popHitText(px, py, `FIRE ×${amt}`, "#00e676");
         break;
       case "guard":
         state.buffs.guard = SEC(4);
-        flashMessage("GIFT: GUARD 4s!");
-        popHitText(W / 2, H / 2, "GUARD 4s", "#448aff");
+        flashMessage("GIFT: GUARD!");
+        popHitText(px, py, "GUARD", "#448aff");
         break;
       case "megabar":
-        state.buffs.megabar = SEC(5);
+        state.buffs.megabar = SEC(4);
         resetPaddle();
-        flashMessage("GIFT: MEGA BAR 5s!");
-        popHitText(W / 2, H / 2, "BAR ×3 5s", "#ff4081");
+        flashMessage("GIFT: MEGA BAR!");
+        popHitText(px, py, "BAR ×3", "#ff4081");
         break;
     }
-    spawnParticles(W / 2, BRICK_TOP + 40, g.glow, 40);
+    spawnParticles(px, py, g.glow, 36);
     state.shake = 14;
   }
 
-  function ensureFiveBalls() {
+  function ensureMultiball(target) {
     let count = state.balls.filter((b) => !b.dead).length;
     if (!count) return;
     const cx = state.paddle.x + state.paddle.w / 2;
     const cy = paddleBallY();
-    while (count < 5) {
+    while (count < target) {
       const b = makeBall(cx, cy);
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.4;
       b.vx = Math.cos(a) * b.speed;
@@ -473,7 +460,7 @@
     state.powerups = [];
     state.trails = [];
     state.hitTexts = [];
-    state.buffs = { multiball5: 0, guard: 0, megabar: 0, fireHits: 0 };
+    state.buffs = { multiball5: 0, multiballTarget: 3, guard: 0, megabar: 0, fireHits: 0 };
     resetPaddle();
     buildLevel(1);
     resetBall();
@@ -588,18 +575,15 @@
     brick.dead = true;
     addScore(brick.pts);
     addCoins(Math.max(1, Math.floor(brick.pts / 8)));
-    spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, brick.glow, brick.isGift ? 32 : 22);
-    if (brick.isGift && brick.gift) {
-      activateGift(brick.gift);
-    } else {
-      maybeDropPower(brick.x + brick.w / 2, brick.y + brick.h / 2);
-    }
-    state.shake = brick.isGift ? 12 : 8;
+    const cx = brick.x + brick.w / 2;
+    const cy = brick.y + brick.h / 2;
+    spawnParticles(cx, cy, brick.glow, 22);
+    maybeDropPower(cx, cy);
+    tryGiftOnBrickBreak(cx, cy);
+    state.shake = 8;
     if (!applySpecial) return;
 
     const effect = ballDef.effect;
-    const cx = brick.x + brick.w / 2;
-    const cy = brick.y + brick.h / 2;
     if (effect === "spark") {
       const below = brickBelow(brick);
       if (below) destroyBrick(below, { damage: 2 }, false);
@@ -770,7 +754,7 @@
     if (state.buffs.guard > 0) state.buffs.guard--;
     if (state.buffs.multiball5 > 0) {
       state.buffs.multiball5--;
-      ensureFiveBalls();
+      ensureMultiball(state.buffs.multiballTarget || 3);
     }
 
     let move = 0;
@@ -955,12 +939,12 @@
         if (brick.dead) return;
         ctx.globalAlpha = brick.hp < brick.maxHp ? 0.75 : 1;
         ctx.shadowColor = brick.glow;
-        ctx.shadowBlur = brick.isGift ? 18 : 10;
-        drawRoundedRect(brick.x, brick.y, brick.w, brick.h, 5, brick.fill, brick.isGift ? "#ffffff" : "rgba(255,255,255,0.25)");
+        ctx.shadowBlur = 10;
+        drawRoundedRect(brick.x, brick.y, brick.w, brick.h, 5, brick.fill, "rgba(255,255,255,0.25)");
         ctx.shadowBlur = 0;
         ctx.globalAlpha = 1;
-        ctx.fillStyle = brick.isGift ? "#fff" : "rgba(0,0,0,0.25)";
-        ctx.font = `bold ${brick.isGift ? 9 : 8}px Orbitron, sans-serif`;
+        ctx.fillStyle = "rgba(0,0,0,0.25)";
+        ctx.font = "bold 8px Orbitron, sans-serif";
         ctx.textAlign = "center";
         ctx.fillText(brick.name, brick.x + brick.w / 2, brick.y + brick.h / 2 + 3);
         if (brick.hp > 1) {
@@ -1058,7 +1042,9 @@
 
   function drawBuffHud() {
     const items = [];
-    if (state.buffs.multiball5 > 0) items.push({ t: `×5 ${Math.ceil(state.buffs.multiball5 / FPS)}s`, c: "#ff2d2d" });
+    if (state.buffs.multiball5 > 0) {
+      items.push({ t: `×${state.buffs.multiballTarget} ${Math.ceil(state.buffs.multiball5 / FPS)}s`, c: "#ff2d2d" });
+    }
     if (state.buffs.fireHits > 0) items.push({ t: `FIRE ${state.buffs.fireHits}`, c: "#00e676" });
     if (state.buffs.guard > 0) items.push({ t: `GUARD ${Math.ceil(state.buffs.guard / FPS)}s`, c: "#448aff" });
     if (state.buffs.megabar > 0) items.push({ t: `BIG ${Math.ceil(state.buffs.megabar / FPS)}s`, c: "#ff4081" });
