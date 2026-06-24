@@ -29,7 +29,7 @@
     <div class="logo">$POKEBALL</div>
     <nav class="nav-links">
       <a href="#features">Features</a>
-      <a href="#play">Play</a>
+      <a href="/game/">Play</a>
       <a href="#nft">NFTs</a>
       <a href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">Chart</a>
       <a href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer" class="nav-cta">Buy</a>
@@ -51,7 +51,7 @@
           <button type="button" class="copy-btn" id="copy-ca" aria-label="Copy contract">Copy</button>
         </div>
         <div class="actions">
-          <a class="btn btn-play" href="#play">▶ Play Now</a>
+          <a class="btn btn-play" href="/game/">▶ Play Now</a>
           <a class="btn btn-buy" href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer">Buy $POKEBALL</a>
           <a class="btn btn-dex" href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">Chart</a>
         </div>
@@ -79,7 +79,7 @@
         <span class="feature-icon">🎮</span>
         <h3>Brick Breaker</h3>
         <p>Classic arcade action with auto-launch balls and level progression.</p>
-        <a href="#play" class="feature-link">Play →</a>
+        <a href="/game/" class="feature-link">Play →</a>
       </article>
       <article class="feature-card panel-box">
         <span class="feature-icon">⚡</span>
@@ -101,26 +101,14 @@
       </article>
     </section>
 
-    <section class="arcade-grid">
-      <div class="arcade-game panel-box" id="play">
-        <div class="panel-head">
-          <h2>▶ Play POKEBALL Breaker</h2>
-          <p>Start → move paddle → smash all blocks → level up!</p>
-        </div>
-        <div class="game-embed-wrap">
-          <iframe src="/game/" title="POKEBALL Breaker Game" class="game-embed" allow="autoplay"></iframe>
-        </div>
-        <a class="btn btn-play game-fullscreen" href="/game/">Open Full Screen</a>
+    <section class="nft-section panel-box" id="nft">
+      <div class="panel-head">
+        <h2>🎴 NFT Collection</h2>
+        <p>Play the game to unlock cards — rewards on start &amp; end every round!</p>
+        <span class="nft-collect-count" id="nft-count">0 / 15 Collected</span>
       </div>
-
-      <div class="arcade-nft panel-box" id="nft">
-        <div class="panel-head">
-          <h2>🎴 NFT Collection</h2>
-          <p>Play to unlock all cards — rewards on start &amp; end!</p>
-          <span class="nft-collect-count" id="nft-count">0 / 15 Collected</span>
-        </div>
-        <div id="nft-gallery-home" class="nft-gallery-scroll"></div>
-      </div>
+      <div id="nft-gallery-home" class="nft-gallery-scroll"></div>
+      <a class="btn btn-play nft-play-cta" href="/game/">▶ Start Game</a>
     </section>
   </div>
 

@@ -622,6 +622,23 @@ html, body {
   font-size: 0.85rem;
 }
 
+.nft-section {
+  padding: 1.5rem;
+}
+
+.nft-section .nft-gallery,
+.nft-section .nft-gallery-scroll > .nft-gallery {
+  margin-bottom: 1.25rem;
+}
+
+.nft-play-cta {
+  display: flex;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  justify-content: center;
+}
+
 .nft-panel {
   position: relative;
   z-index: 10;
@@ -674,7 +691,7 @@ html, body {
 }
 
 @media (max-width: 640px) {
-  .nav-links a:not(.nav-cta):not([href="#play"]) { display: none; }
+  .nav-links a:not(.nav-cta) { display: none; }
   .feature-array { grid-template-columns: 1fr; }
   .stat-array { grid-template-columns: 1fr 1fr; }
   .hero-main { padding: 1.5rem 1.25rem; }

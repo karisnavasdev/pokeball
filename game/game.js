@@ -37,6 +37,11 @@
   const ctx = canvas.getContext("2d");
   const overlay = document.getElementById("overlay");
   const startBtn = document.getElementById("start-btn");
+  const restartBtn = document.getElementById("restart-btn");
+  const overlayTitle = document.getElementById("overlay-title");
+  const overlayMsg = document.getElementById("overlay-msg");
+  const gameLobby = document.getElementById("game-lobby");
+  const gameUi = document.getElementById("game-ui");
   const scoreEl = document.getElementById("score");
   const levelEl = document.getElementById("level");
   const livesEl = document.getElementById("lives");
@@ -278,9 +283,8 @@
     state.running = false;
     showNftReward("end", () => {
       overlay.classList.remove("hidden");
-      overlay.querySelector("h1").textContent = "GAME OVER";
-      overlay.querySelector("p").textContent = `Score: ${state.score} · +${state.sessionCoins} coins`;
-      startBtn.textContent = "Play Again";
+      if (overlayTitle) overlayTitle.textContent = "GAME OVER";
+      if (overlayMsg) overlayMsg.textContent = `Score: ${state.score} · +${state.sessionCoins} coins`;
     });
   }
 
@@ -288,9 +292,8 @@
     state.running = false;
     showNftReward("end", () => {
       overlay.classList.remove("hidden");
-      overlay.querySelector("h1").textContent = "YOU WIN!";
-      overlay.querySelector("p").textContent = `Champion! Score: ${state.score} · +${state.sessionCoins} coins`;
-      startBtn.textContent = "Play Again";
+      if (overlayTitle) overlayTitle.textContent = "YOU WIN!";
+      if (overlayMsg) overlayMsg.textContent = `Champion! Score: ${state.score} · +${state.sessionCoins} coins`;
     });
   }
 
@@ -325,7 +328,14 @@
     });
   }
 
+  function showGameUi() {
+    gameLobby?.classList.add("hidden");
+    gameUi?.classList.remove("hidden");
+    gameUi?.setAttribute("aria-hidden", "false");
+  }
+
   function beginGameplay() {
+    showGameUi();
     state.running = true;
     state.score = 0;
     state.sessionCoins = 0;
@@ -340,9 +350,6 @@
     resetBall();
     updateHud();
     overlay.classList.add("hidden");
-    overlay.querySelector("h1").textContent = "POKEBALL BREAKER";
-    overlay.querySelector("p").textContent = "Break all blocks with your POKEBALL!";
-    startBtn.textContent = "Start Game";
     setTimeout(() => {
       if (state.running && state.ballAttached) launchBall();
     }, 900);
@@ -920,7 +927,6 @@
   }
 
   function openNft() {
-    if (state.running) return;
     state.nftOpen = true;
     refreshNftUi();
     nftPanel.classList.remove("hidden");
@@ -966,11 +972,12 @@
   canvas.addEventListener("pointerdown", (e) => {
     const rect = canvas.getBoundingClientRect();
     pointerX = ((e.clientX - rect.left) / rect.width) * W;
-    if (isModalOpen() || !state.running) return;
+    if (isModalOpen() || !state.running || gameUi?.classList.contains("hidden")) return;
     if (state.ballAttached) launchBall();
   });
 
   startBtn.addEventListener("click", startGame);
+  restartBtn?.addEventListener("click", startGame);
   shopBtn.addEventListener("click", openShop);
   shopFromMenu.addEventListener("click", openShop);
   shopClose.addEventListener("click", closeShop);
