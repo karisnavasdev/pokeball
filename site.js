@@ -15,4 +15,10 @@ document.getElementById("copy-ca")?.addEventListener("click", async () => {
 if (window.PokeNft) {
   PokeNft.renderGallery(document.getElementById("nft-gallery-home"));
   PokeNft.updateCollectCount(document.getElementById("nft-count"));
+  const owned = PokeNft.getOwned().size;
+  const total = PokeNft.NFT_CATALOG.length;
+  const ownedEl = document.getElementById("stat-nft-owned");
+  const totalEl = document.getElementById("stat-nft-total");
+  if (ownedEl) ownedEl.textContent = String(owned);
+  if (totalEl) totalEl.textContent = String(total);
 }

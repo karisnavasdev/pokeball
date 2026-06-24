@@ -1,8 +1,9 @@
 /* POKEBALL NFT card collection */
 .nft-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.85rem;
+}
   max-width: 1100px;
   margin: 0 auto;
 }

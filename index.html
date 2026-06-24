@@ -19,68 +19,110 @@
 
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track">
-      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
-      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
-      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
+      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>COLLECT NFTs</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
+      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>COLLECT NFTs</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
+      <span>$POKEBALL</span><span>CA: POKEPUMP</span><span>PLAY THE GAME</span><span>COLLECT NFTs</span><span>BUY ON PUMP.FUN</span><span>DEXSCREENER</span>
     </div>
   </div>
 
   <header class="nav">
     <div class="logo">$POKEBALL</div>
     <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#play">Play</a>
+      <a href="#nft">NFTs</a>
       <a href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">Chart</a>
-      <a href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer">Buy</a>
-      <a href="#play" class="nav-play">Play</a>
-      <a href="#nft" class="nav-play">NFTs</a>
+      <a href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer" class="nav-cta">Buy</a>
     </nav>
   </header>
 
-  <main class="hero">
-    <div class="hero-badge">SOLANA ARCADE</div>
-    <h1>
-      <span class="gradient">$POKEBALL</span>
-      <span class="sub">Break bricks. Catch the pump.</span>
-    </h1>
-    <p class="lead">The on-chain arcade experience. Smash blocks, stack score, and collect POKEBALL NFT cards every game.</p>
+  <div class="site-wrap">
+    <section class="hero-hub">
+      <div class="hero-main panel-box">
+        <div class="hero-badge">SOLANA ARCADE</div>
+        <h1>
+          <span class="gradient">$POKEBALL</span>
+          <span class="sub">Break bricks. Catch the pump.</span>
+        </h1>
+        <p class="lead">Smash blocks, unlock power balls, and collect NFT cards every round. The funniest pump on Solana.</p>
+        <div class="ca-box">
+          <span class="ca-label">CONTRACT</span>
+          <code id="ca" class="ca-value">pokepump</code>
+          <button type="button" class="copy-btn" id="copy-ca" aria-label="Copy contract">Copy</button>
+        </div>
+        <div class="actions">
+          <a class="btn btn-play" href="#play">▶ Play Now</a>
+          <a class="btn btn-buy" href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer">Buy $POKEBALL</a>
+          <a class="btn btn-dex" href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">Chart</a>
+        </div>
+      </div>
 
-    <div class="ca-box">
-      <span class="ca-label">CONTRACT</span>
-      <code id="ca" class="ca-value">pokepump</code>
-      <button type="button" class="copy-btn" id="copy-ca" aria-label="Copy contract">Copy</button>
-    </div>
+      <div class="hero-side">
+        <div class="stat-array panel-box">
+          <div class="stat"><span class="stat-k">Ticker</span><span class="stat-v">$POKEBALL</span></div>
+          <div class="stat"><span class="stat-k">Chain</span><span class="stat-v">Solana</span></div>
+          <div class="stat"><span class="stat-k">NFT Cards</span><span class="stat-v" id="stat-nft-total">15</span></div>
+          <div class="stat"><span class="stat-k">Collected</span><span class="stat-v" id="stat-nft-owned">0</span></div>
+        </div>
+        <a href="/game/" class="play-cta panel-box">
+          <img src="/game/ball.png" alt="" width="64" height="64" class="play-cta-ball">
+          <div>
+            <strong>POKEBALL BREAKER</strong>
+            <span>Full screen arcade →</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-    <div class="actions">
-      <a class="btn btn-buy" href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer">Buy Now</a>
-      <a class="btn btn-dex" href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener noreferrer">DexScreener</a>
-      <a class="btn btn-play" href="#play">Play Game</a>
-    </div>
+    <section class="feature-array" id="features">
+      <article class="feature-card panel-box">
+        <span class="feature-icon">🎮</span>
+        <h3>Brick Breaker</h3>
+        <p>Classic arcade action with auto-launch balls and level progression.</p>
+        <a href="#play" class="feature-link">Play →</a>
+      </article>
+      <article class="feature-card panel-box">
+        <span class="feature-icon">⚡</span>
+        <h3>11 Power Balls</h3>
+        <p>Fire blast, chain lightning, pierce, column smash &amp; more.</p>
+        <a href="/game/" class="feature-link">Shop →</a>
+      </article>
+      <article class="feature-card panel-box">
+        <span class="feature-icon">🎴</span>
+        <h3>NFT Rewards</h3>
+        <p>Win a card when you start and finish every game round.</p>
+        <a href="#nft" class="feature-link">Collection →</a>
+      </article>
+      <article class="feature-card panel-box">
+        <span class="feature-icon">🚀</span>
+        <h3>Pump.fun</h3>
+        <p>Trade $POKEBALL on Solana. CA: pokepump</p>
+        <a href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener noreferrer" class="feature-link">Buy →</a>
+      </article>
+    </section>
 
-    <div class="stats">
-      <div class="stat"><span class="stat-k">Ticker</span><span class="stat-v">$POKEBALL</span></div>
-      <div class="stat"><span class="stat-k">Chain</span><span class="stat-v">Solana</span></div>
-      <div class="stat"><span class="stat-k">CA</span><span class="stat-v">pokepump</span></div>
-    </div>
-  </main>
+    <section class="arcade-grid">
+      <div class="arcade-game panel-box" id="play">
+        <div class="panel-head">
+          <h2>▶ Play POKEBALL Breaker</h2>
+          <p>Start → move paddle → smash all blocks → level up!</p>
+        </div>
+        <div class="game-embed-wrap">
+          <iframe src="/game/" title="POKEBALL Breaker Game" class="game-embed" allow="autoplay"></iframe>
+        </div>
+        <a class="btn btn-play game-fullscreen" href="/game/">Open Full Screen</a>
+      </div>
 
-  <section class="nft-panel" id="nft">
-    <div class="nft-panel-head">
-      <h2>POKEBALL NFT Collection</h2>
-      <p>Play the game — earn a card reward on start &amp; finish every round!</p>
-      <span class="nft-collect-count" id="nft-count">0 / 15 Collected</span>
-    </div>
-    <div id="nft-gallery-home"></div>
-  </section>
-
-  <section class="game-panel" id="play">
-    <div class="panel-head">
-      <h2>Play POKEBALL Breaker</h2>
-      <p>Click Start, then move the paddle. The ball launches automatically.</p>
-    </div>
-    <div class="game-embed-wrap">
-      <iframe src="/game/" title="POKEBALL Breaker Game" class="game-embed" allow="autoplay"></iframe>
-    </div>
-    <a class="btn btn-play game-fullscreen" href="/game/">Open Full Screen Game</a>
-  </section>
+      <div class="arcade-nft panel-box" id="nft">
+        <div class="panel-head">
+          <h2>🎴 NFT Collection</h2>
+          <p>Play to unlock all cards — rewards on start &amp; end!</p>
+          <span class="nft-collect-count" id="nft-count">0 / 15 Collected</span>
+        </div>
+        <div id="nft-gallery-home" class="nft-gallery-scroll"></div>
+      </div>
+    </section>
+  </div>
 
   <footer class="footer">
     <p>$POKEBALL · CA: pokepump · Not financial advice. Play responsibly.</p>

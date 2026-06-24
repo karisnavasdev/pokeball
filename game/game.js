@@ -306,6 +306,7 @@
     PokeNft.renderGallery(document.getElementById("nft-gallery-game"), { compact: true });
     PokeNft.renderGallery(document.getElementById("nft-gallery-collection"));
     PokeNft.updateCollectCount(document.getElementById("nft-count-game"));
+    PokeNft.updateCollectCount(document.getElementById("nft-count-modal"));
   }
 
   function showNftReward(phase, onDone) {

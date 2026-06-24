@@ -13,34 +13,46 @@
 <body>
   <div class="game-bg"></div>
   <div class="game-shell">
-    <header class="game-header">
+    <header class="game-topbar panel-box">
       <a href="/" class="back">← Home</a>
       <div class="brand">$POKEBALL <span>BREAKER</span></div>
-      <div class="hud">
-        <div class="hud-item"><label>Score</label><strong id="score">0</strong></div>
-        <div class="hud-item"><label>Level</label><strong id="level">1</strong></div>
-        <div class="hud-item"><label>Lives</label><strong id="lives">3</strong></div>
-        <div class="hud-item"><label>Coins</label><strong id="coins">0</strong></div>
+      <div class="topbar-actions">
+        <button type="button" id="shop-btn" class="chip-btn">🛒 Shop</button>
+        <button type="button" id="nft-btn" class="chip-btn chip-btn--nft">🎴 NFTs</button>
       </div>
-      <button type="button" id="shop-btn" class="shop-btn">🛒 Ball Shop</button>
-      <button type="button" id="nft-btn" class="shop-btn shop-btn--nft">🎴 My NFTs</button>
     </header>
 
-    <div class="game-nft-strip">
-      <div class="game-nft-strip-label">NFT REWARDS — PLAY TO COLLECT</div>
-      <div id="nft-gallery-game"></div>
+    <div class="hud-grid panel-box">
+      <div class="hud-item"><label>Score</label><strong id="score">0</strong></div>
+      <div class="hud-item"><label>Level</label><strong id="level">1</strong></div>
+      <div class="hud-item"><label>Lives</label><strong id="lives">3</strong></div>
+      <div class="hud-item"><label>Coins</label><strong id="coins">0</strong></div>
     </div>
 
-    <div class="canvas-wrap">
-      <canvas id="game" width="480" height="640" aria-label="POKEBALL Breaker game"></canvas>
-      <div id="overlay" class="overlay">
-        <img src="ball.png" alt="POKEBALL" class="overlay-ball" width="96" height="96">
-        <h1>POKEBALL BREAKER</h1>
-        <p>Launch your POKEBALL — smash every block!</p>
-        <p class="controls-hint">Move: ← → or A D · Earn NFT cards every game!</p>
-        <button id="start-btn" type="button">Start Game</button>
-        <button type="button" id="shop-from-menu" class="shop-btn shop-btn--menu">🛒 Ball Shop</button>
+    <div class="game-stage">
+      <div class="stage-main">
+        <div class="canvas-wrap panel-box">
+          <canvas id="game" width="480" height="640" aria-label="POKEBALL Breaker game"></canvas>
+          <div id="overlay" class="overlay">
+            <img src="ball.png" alt="POKEBALL" class="overlay-ball" width="96" height="96">
+            <h1>POKEBALL BREAKER</h1>
+            <p>Launch your POKEBALL — smash every block!</p>
+            <p class="controls-hint">← → move · Space launch · Earn NFT rewards!</p>
+            <div class="overlay-actions">
+              <button id="start-btn" type="button" class="chip-btn chip-btn--play">▶ Start Game</button>
+              <button type="button" id="shop-from-menu" class="chip-btn">🛒 Shop</button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <aside class="stage-side panel-box">
+        <div class="side-head">
+          <h2>🎴 NFT Collection</h2>
+          <span class="nft-collect-count" id="nft-count-game">0 / 15</span>
+        </div>
+        <div id="nft-gallery-game" class="side-gallery"></div>
+      </aside>
     </div>
 
     <div id="shop-panel" class="shop-panel hidden" aria-hidden="true">
@@ -57,7 +69,7 @@
       <div class="shop-header">
         <h2>My NFT Collection</h2>
         <p>Win cards when you start &amp; finish each game.</p>
-        <div class="shop-wallet"><span class="nft-collect-count" id="nft-count-game">0 / 15 Collected</span></div>
+        <div class="shop-wallet"><span class="nft-collect-count" id="nft-count-modal">0 / 15</span></div>
         <button type="button" id="nft-close" class="shop-close" aria-label="Close collection">✕</button>
       </div>
       <div id="nft-gallery-collection"></div>
@@ -79,6 +91,6 @@
     </footer>
   </div>
   <script src="/nft-cards.js"></script>
-  <script src="game.js?v=6"></script>
+  <script src="game.js?v=7"></script>
 </body>
 </html>
