@@ -47,6 +47,10 @@
   const shopClose = document.getElementById("shop-close");
   const shopGrid = document.getElementById("shop-grid");
   const shopCoinsEl = document.getElementById("shop-coins");
+  const nftBtn = document.getElementById("nft-btn");
+  const nftPanel = document.getElementById("nft-collection-panel");
+  const nftClose = document.getElementById("nft-close");
+  const nftRewardModal = document.getElementById("nft-reward-modal");
 
   const W = canvas.width;
   const H = canvas.height;
@@ -118,6 +122,7 @@
   const state = {
     running: false,
     shopOpen: false,
+    nftOpen: false,
     score: 0,
     sessionCoins: 0,
     level: 1,
@@ -271,18 +276,22 @@
 
   function gameOver() {
     state.running = false;
-    overlay.classList.remove("hidden");
-    overlay.querySelector("h1").textContent = "GAME OVER";
-    overlay.querySelector("p").textContent = `Score: ${state.score} · +${state.sessionCoins} coins`;
-    startBtn.textContent = "Play Again";
+    showNftReward("end", () => {
+      overlay.classList.remove("hidden");
+      overlay.querySelector("h1").textContent = "GAME OVER";
+      overlay.querySelector("p").textContent = `Score: ${state.score} · +${state.sessionCoins} coins`;
+      startBtn.textContent = "Play Again";
+    });
   }
 
   function winGame() {
     state.running = false;
-    overlay.classList.remove("hidden");
-    overlay.querySelector("h1").textContent = "YOU WIN!";
-    overlay.querySelector("p").textContent = `Champion! Score: ${state.score} · +${state.sessionCoins} coins`;
-    startBtn.textContent = "Play Again";
+    showNftReward("end", () => {
+      overlay.classList.remove("hidden");
+      overlay.querySelector("h1").textContent = "YOU WIN!";
+      overlay.querySelector("p").textContent = `Champion! Score: ${state.score} · +${state.sessionCoins} coins`;
+      startBtn.textContent = "Play Again";
+    });
   }
 
   let flashText = "";
@@ -292,8 +301,30 @@
     flashTimer = 90;
   }
 
-  function startGame() {
-    if (state.shopOpen) closeShop();
+  function refreshNftUi() {
+    if (!window.PokeNft) return;
+    PokeNft.renderGallery(document.getElementById("nft-gallery-game"), { compact: true });
+    PokeNft.renderGallery(document.getElementById("nft-gallery-collection"));
+    PokeNft.updateCollectCount(document.getElementById("nft-count-game"));
+  }
+
+  function showNftReward(phase, onDone) {
+    if (!window.PokeNft) {
+      onDone();
+      return;
+    }
+    const { card, isNew } = PokeNft.grantReward();
+    const title = phase === "start" ? "Start Game Reward!" : "End Game Reward!";
+    const sub = isNew
+      ? `New NFT unlocked — ${card.name}!`
+      : `${card.name} added to your collection!`;
+    PokeNft.showRewardModal(nftRewardModal, card, title, sub, () => {
+      refreshNftUi();
+      onDone();
+    });
+  }
+
+  function beginGameplay() {
     state.running = true;
     state.score = 0;
     state.sessionCoins = 0;
@@ -314,6 +345,12 @@
     setTimeout(() => {
       if (state.running && state.ballAttached) launchBall();
     }, 900);
+  }
+
+  function startGame() {
+    if (state.shopOpen) closeShop();
+    if (state.nftOpen) closeNft();
+    showNftReward("start", beginGameplay);
   }
 
   function circleRect(cx, cy, cr, rx, ry, rw, rh) {
@@ -881,6 +918,25 @@
     shopPanel.setAttribute("aria-hidden", "true");
   }
 
+  function openNft() {
+    if (state.running) return;
+    state.nftOpen = true;
+    refreshNftUi();
+    nftPanel.classList.remove("hidden");
+    nftPanel.setAttribute("aria-hidden", "false");
+  }
+
+  function closeNft() {
+    state.nftOpen = false;
+    nftPanel.classList.add("hidden");
+    nftPanel.setAttribute("aria-hidden", "true");
+  }
+
+  function isModalOpen() {
+    return state.shopOpen || state.nftOpen ||
+      (nftRewardModal && !nftRewardModal.classList.contains("hidden"));
+  }
+
   function loop() {
     update();
     draw();
@@ -888,14 +944,14 @@
   }
 
   window.addEventListener("keydown", (e) => {
-    if (e.code === "Escape" && state.shopOpen) {
-      closeShop();
-      return;
+    if (e.code === "Escape") {
+      if (state.shopOpen) { closeShop(); return; }
+      if (state.nftOpen) { closeNft(); return; }
     }
     keys[e.key] = true;
     if (e.code === "Space") {
       e.preventDefault();
-      if (state.shopOpen) return;
+      if (isModalOpen()) return;
       if (!state.running) return;
       if (state.ballAttached) launchBall();
     }
@@ -909,7 +965,7 @@
   canvas.addEventListener("pointerdown", (e) => {
     const rect = canvas.getBoundingClientRect();
     pointerX = ((e.clientX - rect.left) / rect.width) * W;
-    if (state.shopOpen || !state.running) return;
+    if (isModalOpen() || !state.running) return;
     if (state.ballAttached) launchBall();
   });
 
@@ -917,8 +973,11 @@
   shopBtn.addEventListener("click", openShop);
   shopFromMenu.addEventListener("click", openShop);
   shopClose.addEventListener("click", closeShop);
+  nftBtn?.addEventListener("click", openNft);
+  nftClose?.addEventListener("click", closeNft);
 
   updateHud();
   renderShop();
+  refreshNftUi();
   loop();
 })();

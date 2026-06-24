@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="game.css">
+  <link rel="stylesheet" href="/nft-cards.css">
 </head>
 <body>
   <div class="game-bg"></div>
@@ -22,7 +23,13 @@
         <div class="hud-item"><label>Coins</label><strong id="coins">0</strong></div>
       </div>
       <button type="button" id="shop-btn" class="shop-btn">🛒 Ball Shop</button>
+      <button type="button" id="nft-btn" class="shop-btn shop-btn--nft">🎴 My NFTs</button>
     </header>
+
+    <div class="game-nft-strip">
+      <div class="game-nft-strip-label">NFT REWARDS — PLAY TO COLLECT</div>
+      <div id="nft-gallery-game"></div>
+    </div>
 
     <div class="canvas-wrap">
       <canvas id="game" width="480" height="640" aria-label="POKEBALL Breaker game"></canvas>
@@ -30,7 +37,7 @@
         <img src="ball.png" alt="POKEBALL" class="overlay-ball" width="96" height="96">
         <h1>POKEBALL BREAKER</h1>
         <p>Launch your POKEBALL — smash every block!</p>
-        <p class="controls-hint">Move: ← → or A D · Launch: Space or Tap</p>
+        <p class="controls-hint">Move: ← → or A D · Earn NFT cards every game!</p>
         <button id="start-btn" type="button">Start Game</button>
         <button type="button" id="shop-from-menu" class="shop-btn shop-btn--menu">🛒 Ball Shop</button>
       </div>
@@ -46,12 +53,32 @@
       <div id="shop-grid" class="shop-grid"></div>
     </div>
 
+    <div id="nft-collection-panel" class="shop-panel hidden" aria-hidden="true">
+      <div class="shop-header">
+        <h2>My NFT Collection</h2>
+        <p>Win cards when you start &amp; finish each game.</p>
+        <div class="shop-wallet"><span class="nft-collect-count" id="nft-count-game">0 / 7 Collected</span></div>
+        <button type="button" id="nft-close" class="shop-close" aria-label="Close collection">✕</button>
+      </div>
+      <div id="nft-gallery-collection"></div>
+    </div>
+
+    <div id="nft-reward-modal" class="nft-reward-modal hidden" aria-hidden="true">
+      <div class="nft-reward-box">
+        <h2 class="nft-reward-title">NFT Reward!</h2>
+        <p class="nft-reward-sub">You unlocked a new card</p>
+        <div class="nft-reward-slot"></div>
+        <button type="button" class="nft-reward-claim">Claim Reward</button>
+      </div>
+    </div>
+
     <footer class="game-footer">
       <span>CA: pokepump</span>
       <a href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener">Buy</a>
       <a href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener">Chart</a>
     </footer>
   </div>
-  <script src="game.js?v=5"></script>
+  <script src="/nft-cards.js"></script>
+  <script src="game.js?v=6"></script>
 </body>
 </html>

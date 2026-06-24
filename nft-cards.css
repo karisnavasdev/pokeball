@@ -1,0 +1,265 @@
+/* POKEBALL NFT card collection */
+.nft-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.nft-gallery--compact {
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.nft-card {
+  position: relative;
+  border-radius: 14px;
+  padding: 3px;
+  background: linear-gradient(135deg, #9945ff, #14f195, #00ffd5, #9945ff);
+  background-size: 300% 300%;
+  animation: nft-border 4s ease infinite;
+  box-shadow: 0 8px 32px rgba(153, 69, 255, 0.25);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nft-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(20, 241, 149, 0.3);
+}
+
+.nft-card--locked {
+  filter: grayscale(0.85) brightness(0.55);
+  opacity: 0.75;
+}
+
+.nft-card--locked:hover {
+  transform: none;
+}
+
+.nft-card--reward {
+  animation: nft-reward-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes nft-border {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes nft-reward-pop {
+  0% { transform: scale(0.5) rotate(-8deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.nft-card-shine {
+  position: absolute;
+  inset: 3px;
+  border-radius: 11px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.nft-card-shine::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.12) 45%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.12) 55%,
+    transparent 60%
+  );
+  animation: nft-shine 3s ease-in-out infinite;
+}
+
+@keyframes nft-shine {
+  0%, 100% { transform: translateX(-60%) rotate(12deg); }
+  50% { transform: translateX(60%) rotate(12deg); }
+}
+
+.nft-card-frame {
+  position: relative;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #12121f 0%, #0a0a12 100%);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.nft-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.55rem;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(153, 69, 255, 0.3);
+}
+
+.nft-chain {
+  color: #14f195;
+}
+
+.nft-rarity {
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.nft-rarity--common { background: rgba(148, 163, 184, 0.3); color: #cbd5e1; }
+.nft-rarity--uncommon { background: rgba(34, 211, 238, 0.25); color: #67e8f9; }
+.nft-rarity--rare { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
+.nft-rarity--epic { background: rgba(168, 85, 247, 0.3); color: #d8b4fe; }
+.nft-rarity--legendary { background: rgba(245, 158, 11, 0.35); color: #fcd34d; }
+
+.nft-card-art {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #0d0d18;
+}
+
+.nft-card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.nft-card-footer {
+  padding: 0.45rem 0.55rem 0.55rem;
+  border-top: 1px solid rgba(20, 241, 149, 0.2);
+}
+
+.nft-card-footer h3 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nft-id {
+  font-size: 0.5rem;
+  color: #9aa0b5;
+  font-family: "Orbitron", sans-serif;
+}
+
+.nft-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 5, 12, 0.55);
+  border-radius: 11px;
+  font-size: 1.5rem;
+}
+
+.nft-reward-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(5, 5, 12, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+.nft-reward-modal.hidden { display: none; }
+
+.nft-reward-box {
+  text-align: center;
+  max-width: 280px;
+  width: 100%;
+}
+
+.nft-reward-box h2 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1rem;
+  margin-bottom: 0.35rem;
+  background: linear-gradient(90deg, #9945ff, #14f195);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nft-reward-box p {
+  color: #9aa0b5;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.nft-reward-box .nft-card {
+  max-width: 220px;
+  margin: 0 auto 1rem;
+}
+
+.nft-reward-claim {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: #04140e;
+  background: linear-gradient(135deg, #14f195, #0bc978);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(20, 241, 149, 0.35);
+}
+
+.nft-reward-claim:hover { filter: brightness(1.08); }
+
+.nft-panel-head {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.nft-panel-head h2 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.35rem;
+  background: linear-gradient(90deg, #fff, #9945ff, #14f195);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nft-panel-head p {
+  color: #9aa0b5;
+  font-size: 0.9rem;
+  margin-top: 0.35rem;
+}
+
+.nft-collect-count {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(153, 69, 255, 0.2);
+  border: 1px solid rgba(153, 69, 255, 0.4);
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.7rem;
+  color: #14f195;
+}
+
+.game-nft-strip {
+  margin-bottom: 0.75rem;
+}
+
+.game-nft-strip-label {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: #9aa0b5;
+  margin-bottom: 0.4rem;
+}

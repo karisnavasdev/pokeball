@@ -487,44 +487,12 @@ html, body {
   font-size: 0.9rem;
 }
 
-.game-card {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 1rem;
-  align-items: center;
-  padding: 1rem;
-  border-radius: 16px;
-  background: rgba(8, 8, 14, 0.72);
-  backdrop-filter: blur(10px);
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.15s, box-shadow 0.2s;
-}
-
-.game-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(153, 69, 255, 0.25);
-}
-
-.game-thumb {
-  width: 120px;
-  height: 80px;
-  border-radius: 10px;
-  background: url("/game/ball.png") center / cover no-repeat;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 20px rgba(153, 69, 255, 0.25);
-}
-
-.game-meta strong {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-size: 1rem;
-}
-
-.game-meta span {
-  color: var(--green);
-  font-size: 0.9rem;
-  text-shadow: 0 0 10px rgba(20, 241, 149, 0.4);
+.nft-panel {
+  position: relative;
+  z-index: 10;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
 }
 
 .footer {
@@ -543,8 +511,6 @@ html, body {
 @media (max-width: 640px) {
   .nav-links a:not(.nav-play) { display: none; }
   .stats { grid-template-columns: 1fr; }
-  .game-card { grid-template-columns: 1fr; }
-  .game-thumb { width: 100%; height: 120px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

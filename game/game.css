@@ -234,6 +234,12 @@ html, body {
   color: var(--green);
 }
 
+.shop-btn--nft {
+  background: rgba(0, 255, 213, 0.1);
+  border-color: rgba(0, 255, 213, 0.35);
+  color: var(--cyan);
+}
+
 .shop-panel {
   position: fixed;
   inset: 0;
