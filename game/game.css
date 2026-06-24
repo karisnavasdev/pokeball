@@ -206,3 +206,191 @@ html, body {
 }
 
 .game-footer a:hover { text-decoration: underline; }
+
+.shop-btn {
+  grid-column: 1 / -1;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(153, 69, 255, 0.5);
+  border-radius: 10px;
+  background: rgba(153, 69, 255, 0.15);
+  color: var(--cyan);
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.shop-btn:hover {
+  background: rgba(153, 69, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.shop-btn--menu {
+  margin-top: 0.25rem;
+  background: rgba(20, 241, 149, 0.12);
+  border-color: rgba(20, 241, 149, 0.4);
+  color: var(--green);
+}
+
+.shop-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(5, 5, 12, 0.95);
+  backdrop-filter: blur(10px);
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.shop-panel.hidden { display: none; }
+
+.shop-header {
+  position: relative;
+  max-width: 520px;
+  margin: 0 auto 1rem;
+  text-align: center;
+}
+
+.shop-header h2 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.25rem;
+  background: linear-gradient(90deg, var(--purple), var(--green));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.shop-header p {
+  color: #9aa0b5;
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+.shop-wallet {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #b8bfd4;
+}
+
+.shop-wallet strong {
+  color: var(--green);
+  font-size: 1.1rem;
+}
+
+.shop-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+  max-width: 520px;
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+.shop-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid rgba(153, 69, 255, 0.3);
+  text-align: center;
+}
+
+.shop-card--equipped {
+  border-color: var(--green);
+  box-shadow: 0 0 16px rgba(20, 241, 149, 0.25);
+}
+
+.shop-ball-preview {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fff 50%, var(--ball-color) 50%);
+  border: 2px solid var(--ball-accent);
+  box-shadow: 0 0 12px var(--ball-color);
+  position: relative;
+}
+
+.shop-ball-preview::after {
+  content: "";
+  position: absolute;
+  inset: 44% 0;
+  background: var(--ball-accent);
+  height: 3px;
+}
+
+.shop-card h3 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.shop-card p {
+  font-size: 0.7rem;
+  color: #8b92a8;
+  line-height: 1.35;
+  flex: 1;
+}
+
+.shop-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.tag {
+  font-size: 0.55rem;
+  font-family: "Orbitron", sans-serif;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.tag-dmg { background: rgba(245, 158, 11, 0.25); color: #fbbf24; }
+.tag-fire { background: rgba(255, 69, 0, 0.25); color: #ff6b35; }
+.tag-zap { background: rgba(250, 204, 21, 0.25); color: #facc15; }
+.tag-ice { background: rgba(34, 211, 238, 0.25); color: #22d3ee; }
+.tag-poison { background: rgba(168, 85, 247, 0.25); color: #c084fc; }
+.tag-ghost { background: rgba(209, 213, 219, 0.2); color: #e5e7eb; }
+.tag-steel { background: rgba(148, 163, 184, 0.25); color: #cbd5e1; }
+
+.shop-action {
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--green), #0bc978);
+  color: #04140e;
+}
+
+.shop-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
+  color: #9aa0b5;
+}

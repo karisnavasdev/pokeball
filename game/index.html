@@ -19,7 +19,9 @@
         <div class="hud-item"><label>Score</label><strong id="score">0</strong></div>
         <div class="hud-item"><label>Level</label><strong id="level">1</strong></div>
         <div class="hud-item"><label>Lives</label><strong id="lives">3</strong></div>
+        <div class="hud-item"><label>Coins</label><strong id="coins">0</strong></div>
       </div>
+      <button type="button" id="shop-btn" class="shop-btn">🛒 Ball Shop</button>
     </header>
 
     <div class="canvas-wrap">
@@ -30,7 +32,18 @@
         <p>Launch your POKEBALL — smash every block!</p>
         <p class="controls-hint">Move: ← → or A D · Launch: Space or Tap</p>
         <button id="start-btn" type="button">Start Game</button>
+        <button type="button" id="shop-from-menu" class="shop-btn shop-btn--menu">🛒 Ball Shop</button>
       </div>
+    </div>
+
+    <div id="shop-panel" class="shop-panel hidden" aria-hidden="true">
+      <div class="shop-header">
+        <h2>Ball Shop</h2>
+        <p>Earn coins by breaking blocks. Equip a ball before you play!</p>
+        <div class="shop-wallet">Your coins: <strong id="shop-coins">0</strong></div>
+        <button type="button" id="shop-close" class="shop-close" aria-label="Close shop">✕</button>
+      </div>
+      <div id="shop-grid" class="shop-grid"></div>
     </div>
 
     <footer class="game-footer">
@@ -39,6 +52,6 @@
       <a href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener">Chart</a>
     </footer>
   </div>
-  <script src="game.js?v=3"></script>
+  <script src="game.js?v=4"></script>
 </body>
 </html>
