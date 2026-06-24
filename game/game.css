@@ -105,8 +105,8 @@ html, body {
 
 .game-stage {
   display: grid;
-  grid-template-columns: minmax(120px, 155px) minmax(280px, 1fr) minmax(120px, 155px);
-  gap: 0.65rem;
+  grid-template-columns: minmax(165px, 210px) minmax(280px, 1fr) minmax(165px, 210px);
+  gap: 0.75rem;
   flex: 1;
   align-items: stretch;
 }
@@ -152,13 +152,12 @@ html, body {
   scrollbar-color: var(--purple) transparent;
 }
 
-.side-gallery .nft-gallery {
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
+.side-gallery .nft-gallery--game {
+  grid-template-columns: 1fr;
 }
 
-.side-gallery .nft-card-footer h3 {
-  font-size: 0.45rem;
+.side-gallery .nft-gallery--game .nft-card-art {
+  min-height: 150px;
 }
 
 .overlay-actions {

@@ -81,10 +81,10 @@
   const POWER_TYPES = ["wide", "multiball", "slow", "life"];
 
   const GIFT_DEFS = {
-    multiball5: { fill: "#ff2d2d", glow: "#ff6b6b", name: "×5", pts: 100, label: "5 BALLS 20s" },
-    fire10: { fill: "#00e676", glow: "#69f0ae", name: "FIRE", pts: 120, label: "FIRE ×10" },
-    guard: { fill: "#448aff", glow: "#82b1ff", name: "GUARD", pts: 110, label: "GUARD 10s" },
-    megabar: { fill: "#ff4081", glow: "#ff80ab", name: "BIG", pts: 100, label: "BAR ×3 20s" },
+    multiball5: { fill: "#ff2d2d", glow: "#ff6b6b", name: "×5", pts: 100, label: "5 BALLS 5s" },
+    fire10: { fill: "#00e676", glow: "#69f0ae", name: "FIRE", pts: 120, label: "FIRE ×5" },
+    guard: { fill: "#448aff", glow: "#82b1ff", name: "GUARD", pts: 110, label: "GUARD 4s" },
+    megabar: { fill: "#ff4081", glow: "#ff80ab", name: "BIG", pts: 100, label: "BAR ×3 5s" },
   };
 
   const FPS = 60;
@@ -214,48 +214,61 @@
     const bw = brickWidth();
     const rows = Math.min(BRICK_ROWS + Math.floor((lvl - 1) / 2), 13);
     const giftKeys = Object.keys(GIFT_DEFS);
-    let giftIdx = 0;
+    const openSlots = [];
+
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < BRICK_COLS; c++) {
         if (lvl > 2 && (r + c + lvl) % 11 === 0) continue;
-        const isGiftSlot = r >= 1 && (r * BRICK_COLS + c + lvl) % 9 === 0;
-        let brick;
-        if (isGiftSlot) {
-          const key = giftKeys[giftIdx % giftKeys.length];
-          giftIdx++;
-          const g = GIFT_DEFS[key];
-          brick = {
-            x: BRICK_PAD + c * (bw + BRICK_PAD),
-            y: BRICK_TOP + r * (BRICK_H + BRICK_PAD),
-            w: bw,
-            h: BRICK_H,
-            row: r,
-            col: c,
-            hp: 1,
-            maxHp: 1,
-            isGift: true,
-            gift: key,
-            fill: g.fill,
-            glow: g.glow,
-            name: g.name,
-            pts: g.pts,
-          };
-        } else {
-          const type = COLORS[(r + c + lvl) % COLORS.length];
-          const hp = r < 2 && lvl >= 4 ? 2 : 1;
-          brick = {
-            x: BRICK_PAD + c * (bw + BRICK_PAD),
-            y: BRICK_TOP + r * (BRICK_H + BRICK_PAD),
-            w: bw,
-            h: BRICK_H,
-            row: r,
-            col: c,
-            hp,
-            maxHp: hp,
-            ...type,
-          };
-        }
-        bricks.push(brick);
+        openSlots.push({ r, c });
+      }
+    }
+
+    const giftCount = Math.min(3 + (lvl % 2), openSlots.length);
+    const giftAt = new Set();
+    const pool = openSlots.filter((s) => s.r >= 1);
+    while (giftAt.size < giftCount && pool.length > 0) {
+      const i = Math.floor(Math.random() * pool.length);
+      const { r, c } = pool.splice(i, 1)[0];
+      giftAt.add(`${r},${c}`);
+    }
+
+    let giftIdx = 0;
+    for (const { r, c } of openSlots) {
+      const key = `${r},${c}`;
+      if (giftAt.has(key)) {
+        const giftKey = giftKeys[giftIdx % giftKeys.length];
+        giftIdx++;
+        const g = GIFT_DEFS[giftKey];
+        bricks.push({
+          x: BRICK_PAD + c * (bw + BRICK_PAD),
+          y: BRICK_TOP + r * (BRICK_H + BRICK_PAD),
+          w: bw,
+          h: BRICK_H,
+          row: r,
+          col: c,
+          hp: 1,
+          maxHp: 1,
+          isGift: true,
+          gift: giftKey,
+          fill: g.fill,
+          glow: g.glow,
+          name: g.name,
+          pts: g.pts,
+        });
+      } else {
+        const type = COLORS[(r + c + lvl) % COLORS.length];
+        const hp = r < 2 && lvl >= 4 ? 2 : 1;
+        bricks.push({
+          x: BRICK_PAD + c * (bw + BRICK_PAD),
+          y: BRICK_TOP + r * (BRICK_H + BRICK_PAD),
+          w: bw,
+          h: BRICK_H,
+          row: r,
+          col: c,
+          hp,
+          maxHp: hp,
+          ...type,
+        });
       }
     }
     state.bricks = bricks;
@@ -270,27 +283,27 @@
     if (!g) return;
     switch (giftKey) {
       case "multiball5":
-        state.buffs.multiball5 = SEC(20);
+        state.buffs.multiball5 = SEC(5);
         ensureFiveBalls();
-        flashMessage("GIFT: 5 BALLS!");
-        popHitText(W / 2, H / 2, "×5 BALLS", "#ff2d2d");
+        flashMessage("GIFT: 5 BALLS 5s!");
+        popHitText(W / 2, H / 2, "×5 5s", "#ff2d2d");
         break;
       case "fire10":
-        state.buffs.fireHits = 10;
+        state.buffs.fireHits = 5;
         state.balls.forEach((b) => { if (!b.dead) b.giftFire = true; });
-        flashMessage("GIFT: FIRE ×10!");
-        popHitText(W / 2, H / 2, "FIRE ×10", "#00e676");
+        flashMessage("GIFT: FIRE ×5!");
+        popHitText(W / 2, H / 2, "FIRE ×5", "#00e676");
         break;
       case "guard":
-        state.buffs.guard = SEC(10);
-        flashMessage("GIFT: GUARD MODE!");
-        popHitText(W / 2, H / 2, "GUARD", "#448aff");
+        state.buffs.guard = SEC(4);
+        flashMessage("GIFT: GUARD 4s!");
+        popHitText(W / 2, H / 2, "GUARD 4s", "#448aff");
         break;
       case "megabar":
-        state.buffs.megabar = SEC(20);
+        state.buffs.megabar = SEC(5);
         resetPaddle();
-        flashMessage("GIFT: MEGA BAR ×3!");
-        popHitText(W / 2, H / 2, "BAR ×3", "#ff4081");
+        flashMessage("GIFT: MEGA BAR 5s!");
+        popHitText(W / 2, H / 2, "BAR ×3 5s", "#ff4081");
         break;
     }
     spawnParticles(W / 2, BRICK_TOP + 40, g.glow, 40);
@@ -419,8 +432,8 @@
 
   function refreshNftUi() {
     if (!window.PokeNft) return;
-    PokeNft.renderGallery(document.getElementById("nft-gallery-left"), { compact: true, side: "left" });
-    PokeNft.renderGallery(document.getElementById("nft-gallery-right"), { compact: true, side: "right" });
+    PokeNft.renderGallery(document.getElementById("nft-gallery-left"), { side: "left", large: true });
+    PokeNft.renderGallery(document.getElementById("nft-gallery-right"), { side: "right", large: true });
     PokeNft.renderGallery(document.getElementById("nft-gallery-collection"));
     PokeNft.updateCollectCount(document.getElementById("nft-count-game"));
     PokeNft.updateCollectCount(document.getElementById("nft-count-modal"));

@@ -91,6 +91,7 @@
     const owned = getOwned();
     container.innerHTML = "";
     const compact = opts.compact ? " nft-gallery--compact" : "";
+    const large = opts.large ? " nft-gallery--game" : "";
     const side = opts.side === "left" || opts.side === "right" ? opts.side : null;
     const half = Math.ceil(NFT_CATALOG.length / 2);
     const list = side === "left"
@@ -99,7 +100,7 @@
         ? NFT_CATALOG.slice(half)
         : NFT_CATALOG;
     const wrap = document.createElement("div");
-    wrap.className = `nft-gallery${compact}${side ? " nft-gallery--side" : ""}`;
+    wrap.className = `nft-gallery${compact}${side ? " nft-gallery--side" : ""}${large}`;
     list.forEach((card) => {
       wrap.appendChild(createCardElement(card, {
         owned: owned.has(card.id),
