@@ -20,15 +20,15 @@
   };
 
   const BALL_CATALOG = [
-    { id: "classic", name: "POKEBALL", price: 0, damage: 1, effect: "none", color: "#ee1b24", accent: "#fff", desc: "Classic starter ball" },
-    { id: "great", name: "GREAT BALL", price: 150, damage: 2, effect: "none", color: "#2563eb", accent: "#bfdbfe", desc: "2× attack power" },
-    { id: "ultra", name: "ULTRA BALL", price: 400, damage: 3, effect: "none", color: "#f59e0b", accent: "#1f2937", desc: "3× attack power" },
+    { id: "classic", name: "POKEBALL", price: 0, damage: 1, effect: "spark", color: "#ee1b24", accent: "#fff", desc: "Spark crack — breaks block below on hit" },
+    { id: "great", name: "GREAT BALL", price: 150, damage: 2, effect: "cross", color: "#2563eb", accent: "#bfdbfe", desc: "2× damage + cross smash (4 directions)" },
+    { id: "ultra", name: "ULTRA BALL", price: 400, damage: 3, effect: "column", color: "#f59e0b", accent: "#1f2937", desc: "3× damage + shatters full column" },
     { id: "fire", name: "FIRE BALL", price: 500, damage: 1, effect: "blast", blast: 2, color: "#ff4500", accent: "#ffcc00", desc: "Fire blast destroys 2×2 blocks" },
-    { id: "thunder", name: "THUNDER BALL", price: 600, damage: 1, effect: "chain", color: "#facc15", accent: "#1e1b4b", desc: "Chain lightning hits neighbors" },
+    { id: "thunder", name: "THUNDER BALL", price: 600, damage: 1, effect: "chain", color: "#facc15", accent: "#1e1b4b", desc: "Chain lightning hits all neighbors" },
     { id: "ice", name: "ICE BALL", price: 650, damage: 1, effect: "row", color: "#22d3ee", accent: "#e0f2fe", desc: "Shatters an entire row" },
     { id: "poison", name: "POISON BALL", price: 550, damage: 1, effect: "poison", color: "#a855f7", accent: "#4ade80", desc: "Poisons blocks around impact" },
     { id: "ghost", name: "GHOST BALL", price: 700, damage: 1, effect: "pierce", pierce: 3, color: "#d1d5db", accent: "#6b7280", desc: "Pierces through 3 blocks" },
-    { id: "steel", name: "STEEL BALL", price: 800, damage: 2, effect: "steel", color: "#94a3b8", accent: "#e2e8f0", desc: "2× damage, never slows down" },
+    { id: "steel", name: "STEEL BALL", price: 800, damage: 2, effect: "steel", color: "#94a3b8", accent: "#e2e8f0", desc: "2× damage + horizontal line crash" },
     { id: "dragon", name: "DRAGON BALL", price: 1200, damage: 2, effect: "blast", blast: 3, color: "#dc2626", accent: "#fbbf24", desc: "Dragon blast destroys 3×3 blocks" },
     { id: "master", name: "MASTER BALL", price: 2500, damage: 3, effect: "master", blast: 2, color: "#8b5cf6", accent: "#f472b6", desc: "3× damage + 2×2 mega blast" },
   ];
@@ -352,6 +352,48 @@
     });
   }
 
+  function cardinalNeighbors(brick) {
+    const cx = brick.x + brick.w / 2;
+    const cy = brick.y + brick.h / 2;
+    const pad = BRICK_PAD + 2;
+    return state.bricks.filter((b) => {
+      if (b.dead || b === brick) return false;
+      const bx = b.x + b.w / 2;
+      const by = b.y + b.h / 2;
+      const sameCol = Math.abs(bx - cx) < brick.w * 0.6;
+      const sameRow = Math.abs(by - cy) < brick.h * 0.6;
+      const touchX = brick.x <= b.x + b.w + pad && brick.x + brick.w + pad >= b.x;
+      const touchY = brick.y <= b.y + b.h + pad && brick.y + brick.h + pad >= b.y;
+      return (sameCol || sameRow) && touchX && touchY;
+    });
+  }
+
+  function bricksInColumn(brick) {
+    const cx = brick.x + brick.w / 2;
+    return state.bricks.filter((b) => !b.dead && b !== brick &&
+      Math.abs(b.x + b.w / 2 - cx) < brick.w * 0.6);
+  }
+
+  function brickBelow(brick) {
+    const cx = brick.x + brick.w / 2;
+    const below = state.bricks
+      .filter((b) => !b.dead && b !== brick &&
+        Math.abs(b.x + b.w / 2 - cx) < brick.w * 0.6 && b.y > brick.y)
+      .sort((a, b) => a.y - b.y);
+    return below[0] || null;
+  }
+
+  function horizontalNeighbors(brick) {
+    const cy = brick.y + brick.h / 2;
+    const pad = BRICK_PAD + 2;
+    return state.bricks.filter((b) => {
+      if (b.dead || b === brick) return false;
+      const sameRow = Math.abs(b.y + b.h / 2 - cy) < brick.h * 0.6;
+      const touchX = brick.x <= b.x + b.w + pad && brick.x + brick.w + pad >= b.x;
+      return sameRow && touchX;
+    });
+  }
+
   function destroyBrick(brick, ballDef, applySpecial) {
     if (brick.dead) return;
     brick.hp -= ballDef.damage || 1;
@@ -378,6 +420,23 @@
     if (!applySpecial) return;
 
     const effect = ballDef.effect;
+    if (effect === "spark") {
+      const below = brickBelow(brick);
+      if (below) destroyBrick(below, { damage: 1 }, false);
+      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h, ballDef.color, 10);
+    }
+    if (effect === "cross") {
+      cardinalNeighbors(brick).forEach((b) => destroyBrick(b, { damage: 1 }, false));
+      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, ballDef.color, 16);
+    }
+    if (effect === "column") {
+      bricksInColumn(brick).forEach((b) => destroyBrick(b, { damage: 1 }, false));
+      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, ballDef.color, 24);
+    }
+    if (effect === "steel") {
+      horizontalNeighbors(brick).forEach((b) => destroyBrick(b, { damage: 1 }, false));
+      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, "#94a3b8", 18);
+    }
     if (effect === "blast" || effect === "master") {
       const size = ballDef.blast || 2;
       bricksInBlast(brick, size).forEach((b) => {
@@ -734,6 +793,25 @@
     }
   }
 
+  function powerTags(ball) {
+    const tags = [];
+    if (ball.damage > 1) tags.push(`<span class="tag tag-dmg">${ball.damage}× DMG</span>`);
+    const map = {
+      spark: '<span class="tag tag-spark">SPARK</span>',
+      cross: '<span class="tag tag-cross">CROSS</span>',
+      column: '<span class="tag tag-col">COLUMN</span>',
+      blast: `<span class="tag tag-fire">${ball.blast}×${ball.blast} BLAST</span>`,
+      master: '<span class="tag tag-fire">MEGA BLAST</span>',
+      chain: '<span class="tag tag-zap">CHAIN</span>',
+      row: '<span class="tag tag-ice">ROW</span>',
+      poison: '<span class="tag tag-poison">POISON</span>',
+      pierce: '<span class="tag tag-ghost">PIERCE</span>',
+      steel: '<span class="tag tag-steel">LINE CRASH</span>',
+    };
+    if (map[ball.effect]) tags.push(map[ball.effect]);
+    return tags.join("");
+  }
+
   function renderShop() {
     shopGrid.innerHTML = "";
     BALL_CATALOG.forEach((ball) => {
@@ -745,16 +823,7 @@
         <div class="shop-ball-preview" style="--ball-color:${ball.color};--ball-accent:${ball.accent}"></div>
         <h3>${ball.name}</h3>
         <p>${ball.desc}</p>
-        <div class="shop-card-meta">
-          ${ball.damage > 1 ? `<span class="tag tag-dmg">${ball.damage}× DMG</span>` : ""}
-          ${ball.effect === "blast" ? `<span class="tag tag-fire">${ball.blast}×${ball.blast} BLAST</span>` : ""}
-          ${ball.effect === "master" ? `<span class="tag tag-fire">MEGA BLAST</span>` : ""}
-          ${ball.effect === "chain" ? `<span class="tag tag-zap">CHAIN</span>` : ""}
-          ${ball.effect === "row" ? `<span class="tag tag-ice">ROW</span>` : ""}
-          ${ball.effect === "poison" ? `<span class="tag tag-poison">POISON</span>` : ""}
-          ${ball.effect === "pierce" ? `<span class="tag tag-ghost">PIERCE</span>` : ""}
-          ${ball.effect === "steel" ? `<span class="tag tag-steel">STEEL</span>` : ""}
-        </div>
+        <div class="shop-card-meta">${powerTags(ball)}</div>
       `;
       const btn = document.createElement("button");
       btn.type = "button";
