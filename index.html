@@ -96,7 +96,7 @@
       <article class="feature-card panel-box">
         <span class="feature-icon">🎴</span>
         <h3>NFT Missions</h3>
-        <p>Clear Round 1 to unlock NFT #001, Round 2 for #002 — all the way to Round 15.</p>
+        <p>Start Round 1 to unlock NFT #001, Round 2 for #002 — all the way to Round 15.</p>
         <a href="#nft" class="feature-link">Collection →</a>
       </article>
       <article class="feature-card panel-box">
@@ -110,7 +110,7 @@
     <section class="nft-section panel-box" id="nft">
       <div class="panel-head">
         <h2>🎴 NFT Collection</h2>
-        <p>Each NFT unlocks when you beat its mission round. NFT #001 = Round 1, … #015 = Round 15.</p>
+        <p>Each NFT unlocks when you start its mission round. Click any unlocked card to view it full size.</p>
         <span class="nft-collect-count" id="nft-count">0 / 15 Missions</span>
       </div>
       <div id="nft-gallery-home" class="nft-gallery-scroll"></div>
@@ -121,6 +121,15 @@
   <footer class="footer">
     <p>$POKEBALL · CA: pokepump · <a href="https://x.com/pokeballscoin" target="_blank" rel="noopener noreferrer">@pokeballscoin</a> · Not financial advice. Play responsibly.</p>
   </footer>
+
+  <div id="nft-view-modal" class="nft-reward-modal hidden" aria-hidden="true">
+    <div class="nft-reward-box nft-reward-box--view">
+      <h2 class="nft-reward-title">NFT Card</h2>
+      <p class="nft-reward-sub"></p>
+      <div class="nft-reward-slot"></div>
+      <button type="button" class="nft-reward-claim">Close</button>
+    </div>
+  </div>
 
   <script src="/nft-cards.js"></script>
   <script src="/site.js"></script>

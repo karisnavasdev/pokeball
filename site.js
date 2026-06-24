@@ -13,6 +13,7 @@ document.getElementById("copy-ca")?.addEventListener("click", async () => {
 });
 
 if (window.PokeNft) {
+  PokeNft.setViewModal(document.getElementById("nft-view-modal"));
   PokeNft.renderGallery(document.getElementById("nft-gallery-home"));
   PokeNft.updateCollectCount(document.getElementById("nft-count"));
   const owned = PokeNft.getOwned().size;

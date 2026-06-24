@@ -82,6 +82,32 @@
   transform: none;
 }
 
+.nft-card--clickable {
+  cursor: pointer;
+}
+
+.nft-reward-box--view {
+  max-width: min(440px, 94vw);
+}
+
+.nft-reward-box--view .nft-card {
+  max-width: 380px;
+  margin: 0 auto 1rem;
+}
+
+.nft-card--view .nft-card-art {
+  aspect-ratio: 3 / 4;
+  min-height: 280px;
+}
+
+.nft-reward-box--view .nft-card-footer h3 {
+  font-size: 0.85rem;
+}
+
+.nft-reward-box--view .nft-card-header {
+  font-size: 0.65rem;
+}
+
 .nft-card--reward {
   animation: nft-reward-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }

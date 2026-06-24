@@ -65,8 +65,9 @@
 
     const el = document.createElement("article");
     el.className = "nft-card" +
-      (locked ? " nft-card--locked" : "") +
-      (reward ? " nft-card--reward" : "");
+      (locked ? " nft-card--locked" : " nft-card--clickable") +
+      (reward ? " nft-card--reward" : "") +
+      (opts.view ? " nft-card--view" : "");
     el.dataset.id = card.id;
     el.dataset.mission = String(card.mission);
 
@@ -112,6 +113,33 @@
       }));
     });
     container.appendChild(wrap);
+    bindGalleryClicks(container);
+  }
+
+  let viewModalEl = null;
+  let viewModalHooks = {};
+
+  function setViewModal(el, hooks = {}) {
+    viewModalEl = el;
+    viewModalHooks = hooks;
+  }
+
+  function bindGalleryClicks(container) {
+    if (!container || !viewModalEl || container.dataset.nftClickBound) return;
+    container.dataset.nftClickBound = "1";
+    container.addEventListener("click", (e) => {
+      const cardEl = e.target.closest(".nft-card.nft-card--clickable");
+      if (!cardEl) return;
+      const card = getCard(cardEl.dataset.id);
+      showCardModal(viewModalEl, card, {
+        title: card.name,
+        subtitle: `NFT #${card.id.padStart(2, "0")} · ${card.rarity.toUpperCase()} · ROUND ${String(card.mission).padStart(2, "0")}`,
+        btnText: "Close",
+        view: true,
+        onOpen: viewModalHooks.onOpen,
+        onClose: viewModalHooks.onClose,
+      });
+    });
   }
 
   function updateCollectCount(el) {
@@ -120,33 +148,64 @@
     el.textContent = `${owned.size} / ${MISSION_COUNT} Missions`;
   }
 
-  function showRewardModal(modal, card, title, subtitle, onClose) {
+  function showCardModal(modal, card, options = {}) {
     if (!modal) {
-      onClose?.();
+      options.onClose?.();
       return;
     }
+    const title = options.title ?? "NFT Card";
+    const subtitle = options.subtitle ?? "";
+    const btnText = options.btnText ?? "Close";
+    const view = options.view ?? false;
+    const onClose = options.onClose;
+
     const titleEl = modal.querySelector(".nft-reward-title");
     const subEl = modal.querySelector(".nft-reward-sub");
     const slot = modal.querySelector(".nft-reward-slot");
     const claimBtn = modal.querySelector(".nft-reward-claim");
+    const box = modal.querySelector(".nft-reward-box");
 
     if (titleEl) titleEl.textContent = title;
     if (subEl) subEl.textContent = subtitle;
+    if (claimBtn) claimBtn.textContent = btnText;
+    if (box) box.classList.toggle("nft-reward-box--view", view);
     if (slot) {
       slot.innerHTML = "";
-      slot.appendChild(createCardElement(card, { owned: true, locked: false, reward: true }));
+      slot.appendChild(createCardElement(card, { owned: true, locked: false, reward: true, view }));
     }
 
     modal.classList.remove("hidden");
     modal.setAttribute("aria-hidden", "false");
+    options.onOpen?.();
 
     const close = () => {
       modal.classList.add("hidden");
       modal.setAttribute("aria-hidden", "true");
       claimBtn?.removeEventListener("click", close);
+      modal.removeEventListener("click", onBackdrop);
+      window.removeEventListener("keydown", onEscape);
       onClose?.();
     };
+    const onBackdrop = (e) => {
+      if (e.target === modal) close();
+    };
+    const onEscape = (e) => {
+      if (e.key === "Escape") close();
+    };
+
     claimBtn?.addEventListener("click", close);
+    modal.addEventListener("click", onBackdrop);
+    window.addEventListener("keydown", onEscape);
+  }
+
+  function showRewardModal(modal, card, title, subtitle, onClose) {
+    showCardModal(modal, card, {
+      title,
+      subtitle,
+      btnText: "Claim Reward",
+      view: true,
+      onClose,
+    });
   }
 
   window.PokeNft = {
@@ -160,6 +219,8 @@
     createCardElement,
     renderGallery,
     updateCollectCount,
+    setViewModal,
+    showCardModal,
     showRewardModal,
   };
 })();

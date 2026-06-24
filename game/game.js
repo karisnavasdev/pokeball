@@ -371,40 +371,49 @@
     clearBuffs();
     state.level++;
     state.paddle.wide = Math.max(0, state.paddle.wide - 60);
-    buildLevel(state.level);
+    flashMessage(`ROUND ${state.level}`);
+    enterRound(state.level);
+  }
+
+  function enterRound(round) {
+    buildLevel(round);
     resetBall();
     updateHud();
-    flashMessage(`ROUND ${state.level}`);
+
+    const startPlay = () => {
+      state.running = true;
+      refreshNftUi();
+      setTimeout(() => {
+        if (state.running && state.ballAttached) launchBall();
+      }, 900);
+    };
+
+    if (!window.PokeNft) {
+      startPlay();
+      return;
+    }
+
+    state.running = false;
+    const { card, isNew } = PokeNft.unlockMission(round);
+    const roundLabel = String(round).padStart(2, "0");
+    PokeNft.showCardModal(nftRewardModal, card, {
+      title: `Mission ${round} — Round ${roundLabel}`,
+      subtitle: isNew
+        ? `NFT #${roundLabel} unlocked! Smash the blocks to clear this mission.`
+        : `NFT #${roundLabel} · Clear all blocks to finish Round ${roundLabel}.`,
+      btnText: "Start Round",
+      view: true,
+      onClose: startPlay,
+    });
   }
 
   function onMissionCleared(completedRound) {
     state.running = false;
-    const finish = () => {
-      refreshNftUi();
-      if (completedRound >= MAX_ROUNDS) {
-        winGame();
-      } else {
-        state.running = true;
-        levelComplete();
-      }
-    };
-
-    if (!window.PokeNft) {
-      finish();
-      return;
-    }
-
-    const { card, isNew } = PokeNft.unlockMission(completedRound);
-    if (isNew) {
-      PokeNft.showRewardModal(
-        nftRewardModal,
-        card,
-        `Mission ${completedRound} Complete!`,
-        `NFT #${String(completedRound).padStart(2, "0")} unlocked!`,
-        finish
-      );
+    refreshNftUi();
+    if (completedRound >= MAX_ROUNDS) {
+      winGame();
     } else {
-      finish();
+      levelComplete();
     }
   }
 
@@ -468,7 +477,7 @@
 
   function beginGameplay() {
     showGameUi();
-    state.running = true;
+    state.running = false;
     state.score = 0;
     state.sessionCoins = 0;
     state.level = 1;
@@ -480,13 +489,8 @@
     state.hitTexts = [];
     state.buffs = { multiball5: 0, multiballTarget: 3, guard: 0, megabar: 0, fireHits: 0 };
     resetPaddle();
-    buildLevel(1);
-    resetBall();
-    updateHud();
     overlay.classList.add("hidden");
-    setTimeout(() => {
-      if (state.running && state.ballAttached) launchBall();
-    }, 900);
+    enterRound(1);
   }
 
   function circleRect(cx, cy, cr, rx, ry, rw, rh) {
@@ -1221,6 +1225,20 @@
 
   updateHud();
   renderShop();
+  if (window.PokeNft) PokeNft.setViewModal(nftRewardModal, {
+    onOpen: () => {
+      if (state.running) {
+        state.pausedForNftView = true;
+        state.running = false;
+      }
+    },
+    onClose: () => {
+      if (state.pausedForNftView) {
+        state.pausedForNftView = false;
+        state.running = true;
+      }
+    },
+  });
   refreshNftUi();
   loop();
 })();
