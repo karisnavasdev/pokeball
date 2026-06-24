@@ -1,0 +1,22 @@
+{
+	"short_name": "Lacoste - Ace breaker",
+	"name": "Lacoste - Ace breaker",
+	"description": "Play and break as many bricks as you can",
+	"start_url": "/ace-breaker-rg/",
+	"background_color": "#000000",
+	"theme_color": "#000000",
+	"orientation": "portrait",
+	"icons": [
+		{
+			"src": "/ace-breaker-rg/icons/icon_192.png?v=3a0bb480",
+			"type": "image/png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "/ace-breaker-rg/icons/icon_512.png?v=3a0bb480",
+			"type": "image/png",
+			"sizes": "512x512"
+		}
+	],
+	"display": "fullscreen"
+}
