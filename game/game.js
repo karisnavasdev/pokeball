@@ -79,6 +79,16 @@
 
   const POWER_TYPES = ["wide", "multiball", "slow", "life"];
 
+  const GIFT_DEFS = {
+    multiball5: { fill: "#ff2d2d", glow: "#ff6b6b", name: "×5", pts: 100, label: "5 BALLS 20s" },
+    fire10: { fill: "#00e676", glow: "#69f0ae", name: "FIRE", pts: 120, label: "FIRE ×10" },
+    guard: { fill: "#448aff", glow: "#82b1ff", name: "GUARD", pts: 110, label: "GUARD 10s" },
+    megabar: { fill: "#ff4081", glow: "#ff80ab", name: "BIG", pts: 100, label: "BAR ×3 20s" },
+  };
+
+  const FPS = 60;
+  const SEC = (n) => n * FPS;
+
   const ballImg = new Image();
   let ballImgReady = false;
   ballImg.onload = () => { ballImgReady = true; };
@@ -140,14 +150,24 @@
     trails: [],
     ballAttached: true,
     shake: 0,
+    hitTexts: [],
+    buffs: { multiball5: 0, guard: 0, megabar: 0, fireHits: 0 },
   };
+
+  const PADDLE_BASE_W = 104;
 
   function brickWidth() {
     return (W - BRICK_PAD * (BRICK_COLS + 1)) / BRICK_COLS;
   }
 
   function resetPaddle() {
-    state.paddle.w = state.paddle.wide > 0 ? 148 : 104;
+    if (state.buffs.megabar > 0) {
+      state.paddle.w = PADDLE_BASE_W * 3;
+    } else if (state.paddle.wide > 0) {
+      state.paddle.w = 148;
+    } else {
+      state.paddle.w = PADDLE_BASE_W;
+    }
     state.paddle.x = W / 2 - state.paddle.w / 2;
   }
 
@@ -181,25 +201,104 @@
     const bricks = [];
     const bw = brickWidth();
     const rows = Math.min(BRICK_ROWS + Math.floor((lvl - 1) / 2), 9);
+    const giftKeys = Object.keys(GIFT_DEFS);
+    let giftIdx = 0;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < BRICK_COLS; c++) {
         if (lvl > 2 && (r + c + lvl) % 11 === 0) continue;
-        const type = COLORS[(r + c + lvl) % COLORS.length];
-        const hp = r < 2 && lvl >= 4 ? 2 : 1;
-        bricks.push({
-          x: BRICK_PAD + c * (bw + BRICK_PAD),
-          y: BRICK_TOP + r * (BRICK_H + BRICK_PAD),
-          w: bw,
-          h: BRICK_H,
-          row: r,
-          col: c,
-          hp,
-          maxHp: hp,
-          ...type,
-        });
+        const isGiftSlot = r >= 1 && (r * BRICK_COLS + c + lvl) % 9 === 0;
+        let brick;
+        if (isGiftSlot) {
+          const key = giftKeys[giftIdx % giftKeys.length];
+          giftIdx++;
+          const g = GIFT_DEFS[key];
+          brick = {
+            x: BRICK_PAD + c * (bw + BRICK_PAD),
+            y: BRICK_TOP + r * (BRICK_H + BRICK_PAD),
+            w: bw,
+            h: BRICK_H,
+            row: r,
+            col: c,
+            hp: 1,
+            maxHp: 1,
+            isGift: true,
+            gift: key,
+            fill: g.fill,
+            glow: g.glow,
+            name: g.name,
+            pts: g.pts,
+          };
+        } else {
+          const type = COLORS[(r + c + lvl) % COLORS.length];
+          const hp = r < 2 && lvl >= 4 ? 2 : 1;
+          brick = {
+            x: BRICK_PAD + c * (bw + BRICK_PAD),
+            y: BRICK_TOP + r * (BRICK_H + BRICK_PAD),
+            w: bw,
+            h: BRICK_H,
+            row: r,
+            col: c,
+            hp,
+            maxHp: hp,
+            ...type,
+          };
+        }
+        bricks.push(brick);
       }
     }
     state.bricks = bricks;
+  }
+
+  function popHitText(x, y, text, color = "#14f195") {
+    state.hitTexts.push({ x, y, text, color, life: 1 });
+  }
+
+  function activateGift(giftKey) {
+    const g = GIFT_DEFS[giftKey];
+    if (!g) return;
+    switch (giftKey) {
+      case "multiball5":
+        state.buffs.multiball5 = SEC(20);
+        ensureFiveBalls();
+        flashMessage("GIFT: 5 BALLS!");
+        popHitText(W / 2, H / 2, "×5 BALLS", "#ff2d2d");
+        break;
+      case "fire10":
+        state.buffs.fireHits = 10;
+        state.balls.forEach((b) => { if (!b.dead) b.giftFire = true; });
+        flashMessage("GIFT: FIRE ×10!");
+        popHitText(W / 2, H / 2, "FIRE ×10", "#00e676");
+        break;
+      case "guard":
+        state.buffs.guard = SEC(10);
+        flashMessage("GIFT: GUARD MODE!");
+        popHitText(W / 2, H / 2, "GUARD", "#448aff");
+        break;
+      case "megabar":
+        state.buffs.megabar = SEC(20);
+        resetPaddle();
+        flashMessage("GIFT: MEGA BAR ×3!");
+        popHitText(W / 2, H / 2, "BAR ×3", "#ff4081");
+        break;
+    }
+    spawnParticles(W / 2, BRICK_TOP + 40, g.glow, 40);
+    state.shake = 14;
+  }
+
+  function ensureFiveBalls() {
+    let count = state.balls.filter((b) => !b.dead).length;
+    if (!count) return;
+    const cx = state.paddle.x + state.paddle.w / 2;
+    const cy = paddleBallY();
+    while (count < 5) {
+      const b = makeBall(cx, cy);
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.4;
+      b.vx = Math.cos(a) * b.speed;
+      b.vy = Math.sin(a) * b.speed;
+      state.balls.push(b);
+      count++;
+    }
+    state.ballAttached = false;
   }
 
   function spawnParticles(x, y, color, n = 12) {
@@ -345,6 +444,8 @@
     state.particles = [];
     state.powerups = [];
     state.trails = [];
+    state.hitTexts = [];
+    state.buffs = { multiball5: 0, guard: 0, megabar: 0, fireHits: 0 };
     resetPaddle();
     buildLevel(1);
     resetBall();
@@ -459,51 +560,90 @@
     brick.dead = true;
     addScore(brick.pts);
     addCoins(Math.max(1, Math.floor(brick.pts / 8)));
-    spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, brick.glow, 18);
-    maybeDropPower(brick.x + brick.w / 2, brick.y + brick.h / 2);
-    state.shake = 7;
+    spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, brick.glow, brick.isGift ? 32 : 22);
+    if (brick.isGift && brick.gift) {
+      activateGift(brick.gift);
+    } else {
+      maybeDropPower(brick.x + brick.w / 2, brick.y + brick.h / 2);
+    }
+    state.shake = brick.isGift ? 12 : 8;
     if (!applySpecial) return;
 
     const effect = ballDef.effect;
+    const cx = brick.x + brick.w / 2;
+    const cy = brick.y + brick.h / 2;
     if (effect === "spark") {
       const below = brickBelow(brick);
-      if (below) destroyBrick(below, { damage: 1 }, false);
-      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h, ballDef.color, 10);
+      if (below) destroyBrick(below, { damage: 2 }, false);
+      spawnParticles(cx, cy + brick.h / 2, ballDef.color, 18);
+      popHitText(cx, cy, "SPARK", ballDef.color);
     }
     if (effect === "cross") {
-      cardinalNeighbors(brick).forEach((b) => destroyBrick(b, { damage: 1 }, false));
-      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, ballDef.color, 16);
+      cardinalNeighbors(brick).forEach((b) => destroyBrick(b, { damage: 2 }, false));
+      spawnParticles(cx, cy, ballDef.color, 28);
+      popHitText(cx, cy, "CROSS", ballDef.color);
     }
     if (effect === "column") {
-      bricksInColumn(brick).forEach((b) => destroyBrick(b, { damage: 1 }, false));
-      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, ballDef.color, 24);
+      bricksInColumn(brick).forEach((b) => destroyBrick(b, { damage: 2 }, false));
+      spawnParticles(cx, cy, ballDef.color, 36);
+      popHitText(cx, cy, "COLUMN", ballDef.color);
     }
     if (effect === "steel") {
-      horizontalNeighbors(brick).forEach((b) => destroyBrick(b, { damage: 1 }, false));
-      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, "#94a3b8", 18);
+      horizontalNeighbors(brick).forEach((b) => destroyBrick(b, { damage: 2 }, false));
+      spawnParticles(cx, cy, "#94a3b8", 26);
+      popHitText(cx, cy, "STEEL", "#94a3b8");
     }
     if (effect === "blast" || effect === "master") {
       const size = ballDef.blast || 2;
       bricksInBlast(brick, size).forEach((b) => {
-        if (b !== brick) destroyBrick(b, { damage: effect === "master" ? 2 : 1 }, false);
+        if (b !== brick) destroyBrick(b, { damage: effect === "master" ? 3 : 2 }, false);
       });
-      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, ballDef.color, 28);
+      spawnParticles(cx, cy, ballDef.color, 40);
+      popHitText(cx, cy, `${size}×${size} BLAST`, ballDef.color);
     }
     if (effect === "chain") {
-      adjacentBricks(brick).forEach((b) => destroyBrick(b, { damage: 1 }, false));
-      spawnParticles(brick.x + brick.w / 2, brick.y + brick.h / 2, "#facc15", 22);
+      adjacentBricks(brick).forEach((b) => destroyBrick(b, { damage: 2 }, false));
+      spawnParticles(cx, cy, "#facc15", 34);
+      popHitText(cx, cy, "CHAIN", "#facc15");
     }
     if (effect === "row") {
       bricksInRow(brick).forEach((b) => {
-        if (b !== brick) destroyBrick(b, { damage: 1 }, false);
+        if (b !== brick) destroyBrick(b, { damage: 2 }, false);
       });
-      spawnParticles(brick.x + brick.w / 2, brick.y, "#22d3ee", 30);
+      spawnParticles(cx, cy, "#22d3ee", 38);
+      popHitText(cx, cy, "ROW", "#22d3ee");
     }
   }
 
   function resolveBrickHit(ball, brick) {
     const def = getBallDef(ball.ballId);
     const pierce = def.effect === "pierce" && ball.pierceLeft > 0;
+    const cx = brick.x + brick.w / 2;
+    const cy = brick.y + brick.h / 2;
+
+    if (state.buffs.fireHits > 0) {
+      state.buffs.fireHits--;
+      if (!pierce) {
+        const overlapL = ball.x + ball.r - brick.x;
+        const overlapR = brick.x + brick.w - (ball.x - ball.r);
+        const overlapT = ball.y + ball.r - brick.y;
+        const overlapB = brick.y + brick.h - (ball.y - ball.r);
+        const minO = Math.min(overlapL, overlapR, overlapT, overlapB);
+        if (minO === overlapL) { ball.x = brick.x - ball.r - 0.5; ball.vx = -Math.abs(ball.vx); }
+        else if (minO === overlapR) { ball.x = brick.x + brick.w + ball.r + 0.5; ball.vx = Math.abs(ball.vx); }
+        else if (minO === overlapT) { ball.y = brick.y - ball.r - 0.5; ball.vy = -Math.abs(ball.vy); }
+        else { ball.y = brick.y + brick.h + ball.r + 0.5; ball.vy = Math.abs(ball.vy); }
+      }
+      destroyBrick(brick, { damage: 5, effect: "blast", blast: 2 }, true);
+      spawnParticles(cx, cy, "#ff6600", 45);
+      popHitText(cx, cy - 10, `FIRE ${state.buffs.fireHits}`, "#00e676");
+      state.shake = 15;
+      if (state.buffs.fireHits === 0) {
+        state.balls.forEach((b) => { b.giftFire = false; });
+        flashMessage("FIRE GIFT USED UP");
+      }
+      return;
+    }
 
     if (!pierce) {
       const overlapL = ball.x + ball.r - brick.x;
@@ -574,14 +714,36 @@
 
     const def = getBallDef(ball.ballId);
     state.trails.push({ x: ball.x, y: ball.y, life: 1, ballId: ball.ballId });
-    if (ball.y - ball.r > H + 20) ball.dead = true;
+    if (ball.y - ball.r > H + 20) {
+      if (state.buffs.guard > 0) {
+        ball.y = PADDLE_Y - ball.r - 2;
+        ball.vy = -Math.abs(ball.speed);
+        ball.vx *= 0.95;
+        spawnParticles(ball.x, ball.y, "#448aff", 10);
+      } else {
+        ball.dead = true;
+      }
+    }
   }
 
   function update() {
     if (!state.running) return;
 
-    if (state.paddle.wide > 0) state.paddle.wide--;
-    state.paddle.w = state.paddle.wide > 0 ? 148 : 104;
+    if (state.buffs.megabar > 0) {
+      state.buffs.megabar--;
+      state.paddle.w = PADDLE_BASE_W * 3;
+    } else if (state.paddle.wide > 0) {
+      state.paddle.wide--;
+      state.paddle.w = 148;
+    } else {
+      state.paddle.w = PADDLE_BASE_W;
+    }
+
+    if (state.buffs.guard > 0) state.buffs.guard--;
+    if (state.buffs.multiball5 > 0) {
+      state.buffs.multiball5--;
+      ensureFiveBalls();
+    }
 
     let move = 0;
     if (keys.ArrowLeft || keys.a || keys.A) move -= 1;
@@ -619,7 +781,13 @@
     state.particles = state.particles.filter((p) => p.life > 0);
 
     state.trails.forEach((t) => { t.life -= 0.08; });
-    state.trails = state.trails.filter((t) => t.life > 0).slice(-50);
+    state.trails = state.trails.filter((t) => t.life > 0).slice(-60);
+
+    state.hitTexts.forEach((t) => {
+      t.y -= 0.6;
+      t.life -= 0.022;
+    });
+    state.hitTexts = state.hitTexts.filter((t) => t.life > 0);
 
     if (state.bricks.length && state.bricks.every((b) => b.dead)) {
       if (state.level >= 10) winGame();
@@ -674,7 +842,9 @@
     }
   }
 
-  function drawStyledBall(x, y, r, spin, def) {
+  function drawStyledBall(x, y, r, spin, def, ball) {
+    const fireGift = ball?.giftFire || state.buffs.fireHits > 0;
+    if (fireGift) def = getBallDef("fire");
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(spin);
@@ -757,12 +927,12 @@
         if (brick.dead) return;
         ctx.globalAlpha = brick.hp < brick.maxHp ? 0.75 : 1;
         ctx.shadowColor = brick.glow;
-        ctx.shadowBlur = 10;
-        drawRoundedRect(brick.x, brick.y, brick.w, brick.h, 5, brick.fill, "rgba(255,255,255,0.25)");
+        ctx.shadowBlur = brick.isGift ? 18 : 10;
+        drawRoundedRect(brick.x, brick.y, brick.w, brick.h, 5, brick.fill, brick.isGift ? "#ffffff" : "rgba(255,255,255,0.25)");
         ctx.shadowBlur = 0;
         ctx.globalAlpha = 1;
-        ctx.fillStyle = "rgba(0,0,0,0.25)";
-        ctx.font = "bold 8px Orbitron, sans-serif";
+        ctx.fillStyle = brick.isGift ? "#fff" : "rgba(0,0,0,0.25)";
+        ctx.font = `bold ${brick.isGift ? 9 : 8}px Orbitron, sans-serif`;
         ctx.textAlign = "center";
         ctx.fillText(brick.name, brick.x + brick.w / 2, brick.y + brick.h / 2 + 3);
         if (brick.hp > 1) {
@@ -771,12 +941,18 @@
         }
       });
 
+      if (state.buffs.guard > 0) {
+        ctx.strokeStyle = "rgba(68, 138, 255, 0.35)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(4, 4, W - 8, H - 8);
+      }
+
       const pg = ctx.createLinearGradient(state.paddle.x, PADDLE_Y, state.paddle.x + state.paddle.w, PADDLE_Y);
-      pg.addColorStop(0, "#9945ff");
+      pg.addColorStop(0, state.buffs.megabar > 0 ? "#ff4081" : "#9945ff");
       pg.addColorStop(0.5, "#14f195");
-      pg.addColorStop(1, "#9945ff");
-      ctx.shadowColor = "#14f195";
-      ctx.shadowBlur = 16;
+      pg.addColorStop(1, state.buffs.megabar > 0 ? "#ff4081" : "#9945ff");
+      ctx.shadowColor = state.buffs.megabar > 0 ? "#ff4081" : "#14f195";
+      ctx.shadowBlur = state.buffs.megabar > 0 ? 24 : 16;
       drawRoundedRect(state.paddle.x, PADDLE_Y, state.paddle.w, PADDLE_H, 7, pg, "rgba(255,255,255,0.3)");
       ctx.shadowBlur = 0;
 
@@ -797,8 +973,22 @@
       });
 
       state.balls.forEach((ball) => {
-        drawStyledBall(ball.x, ball.y, ball.r, ball.spin, getBallDef(ball.ballId));
+        drawStyledBall(ball.x, ball.y, ball.r, ball.spin, getBallDef(ball.ballId), ball);
       });
+
+      state.hitTexts.forEach((t) => {
+        ctx.globalAlpha = t.life;
+        ctx.fillStyle = t.color;
+        ctx.font = "bold 11px Orbitron, sans-serif";
+        ctx.textAlign = "center";
+        ctx.shadowColor = t.color;
+        ctx.shadowBlur = 8;
+        ctx.fillText(t.text, t.x, t.y);
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+      });
+
+      drawBuffHud();
 
       state.particles.forEach((p) => {
         ctx.globalAlpha = p.life;
@@ -836,6 +1026,26 @@
     } catch (err) {
       console.error("POKEBALL draw error:", err);
     }
+  }
+
+  function drawBuffHud() {
+    const items = [];
+    if (state.buffs.multiball5 > 0) items.push({ t: `×5 ${Math.ceil(state.buffs.multiball5 / FPS)}s`, c: "#ff2d2d" });
+    if (state.buffs.fireHits > 0) items.push({ t: `FIRE ${state.buffs.fireHits}`, c: "#00e676" });
+    if (state.buffs.guard > 0) items.push({ t: `GUARD ${Math.ceil(state.buffs.guard / FPS)}s`, c: "#448aff" });
+    if (state.buffs.megabar > 0) items.push({ t: `BIG ${Math.ceil(state.buffs.megabar / FPS)}s`, c: "#ff4081" });
+    if (!items.length) return;
+    ctx.font = "bold 8px Orbitron, sans-serif";
+    ctx.textAlign = "right";
+    let y = 14;
+    items.forEach((item) => {
+      ctx.fillStyle = item.c;
+      ctx.shadowColor = item.c;
+      ctx.shadowBlur = 6;
+      ctx.fillText(item.t, W - 8, y);
+      y += 12;
+    });
+    ctx.shadowBlur = 0;
   }
 
   function powerTags(ball) {
