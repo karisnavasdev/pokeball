@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>POKEBALL Breaker — $POKEBALL Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/game/game.css">
+</head>
+<body>
+  <div class="game-bg"></div>
+  <div class="game-shell">
+    <header class="game-header">
+      <a href="/" class="back">← Home</a>
+      <div class="brand">$POKEBALL <span>BREAKER</span></div>
+      <div class="hud">
+        <div class="hud-item"><label>Score</label><strong id="score">0</strong></div>
+        <div class="hud-item"><label>Level</label><strong id="level">1</strong></div>
+        <div class="hud-item"><label>Lives</label><strong id="lives">3</strong></div>
+      </div>
+    </header>
+
+    <div class="canvas-wrap">
+      <canvas id="game" width="480" height="640" aria-label="POKEBALL Breaker game"></canvas>
+      <div id="overlay" class="overlay">
+        <img src="/game/ball.png" alt="" class="overlay-ball" width="96" height="96">
+        <h1>POKEBALL BREAKER</h1>
+        <p>Break all blocks. Catch power-ups. Don't drop the ball.</p>
+        <p class="controls-hint">← → or A D · Space to launch · Touch to move</p>
+        <button id="start-btn" type="button">Start Game</button>
+      </div>
+    </div>
+
+    <footer class="game-footer">
+      <span>CA: pokepump</span>
+      <a href="https://pump.fun/coin/pokepump" target="_blank" rel="noopener">Buy</a>
+      <a href="https://dexscreener.com/solana/pokepump" target="_blank" rel="noopener">Chart</a>
+    </footer>
+  </div>
+  <script src="/game/game.js"></script>
+</body>
+</html>

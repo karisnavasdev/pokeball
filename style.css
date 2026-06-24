@@ -481,7 +481,7 @@ html, body {
   width: 120px;
   height: 80px;
   border-radius: 10px;
-  background: url("/123.png") center / cover no-repeat;
+  background: url("/game/ball.png") center / cover no-repeat;
   border: 2px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 0 20px rgba(153, 69, 255, 0.25);
 }
